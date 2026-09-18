@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAMANVAY — Maintenance Block Scheduler</title>
+  <meta name="description" content="AI-assisted maintenance block scheduling and planning for Divisional Railway Managers"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#f1f5f9;--surface:#fff;--surface2:#f8fafc;--surface3:#e2e8f0;
+      --border:#d1d5db;--border2:#9ca3af;
+      --accent:#1e3a8a;--accent2:#1d4ed8;
+      --green:#166534;--amber:#92400e;--red:#991b1b;--sky:#075985;
+      --text:#111827;--text2:#374151;--text3:#6b7280;
+      --track:#991b1b;--traction:#92400e;--signal:#1e3a8a;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:Roboto,Arial,sans-serif;overflow-x:hidden;font-size:14px;}
+
+    /* HEADER */
+    .header{display:flex;align-items:center;gap:12px;padding:0 20px;min-height:50px;background:#1e3a8a;border-bottom:4px solid #b45309;color:#fff;position:sticky;top:0;z-index:100;}
+    .logo{display:flex;align-items:center;gap:10px;}
+    .logo .ir-box{width:32px;height:32px;background:#fff;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1px solid #bfdbfe;flex-shrink:0;}
+    .logo-title{font-size:14px;font-weight:700;color:#fff;}
+    .logo-sep{color:#93c5fd;margin:0 3px;}
+    .logo-sub{color:#bfdbfe;font-weight:400;font-size:13px;}
+    .header-nav{display:flex;align-items:center;gap:4px;margin-left:12px;border-left:1px solid #2d4fa3;padding-left:12px;}
+    .btn-nav{background:transparent;border:1px solid #2d4fa3;color:#bfdbfe;padding:4px 10px;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+    .btn-nav:hover,.btn-nav.active{background:#172554;border-color:#3b6fd4;color:#fff;}
+    #live-time{font-size:12px;color:#93c5fd;padding:4px 10px;background:#172554;border:1px solid #2d4fa3;margin-left:auto;font-variant-numeric:tabular-nums;}
+
+    /* LAYOUT */
+    .main-grid{display:grid;grid-template-columns:360px 1fr;gap:0;height:calc(100vh - 54px);}
+    .sidebar{background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+    .panel{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+
+    /* SIDEBAR */
+    .sb-section{border-bottom:1px solid var(--border);padding:12px 14px;}
+    .sb-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+    /* Keep .sb-title for backward compat */
+    .sb-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+    .sb-title::after{display:none;}
+
+    /* CORRIDOR SELECT */
+    .corridor-select{width:100%;background:#fff;border:1px solid var(--border2);color:var(--text);padding:7px 10px;font-size:13px;cursor:pointer;outline:none;border-radius:2px;}
+    .corridor-select:focus{border-color:var(--accent);}
+
+    /* FAULT CARDS */
+    .fault-card{background:#fff;border:1px solid var(--border);border-left:3px solid #d1d5db;padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:border-left-color .1s,background .1s;}
+    .fault-card:hover{background:#f9fafb;}
+    .fault-card.selected{border-left-color:#1e3a8a;background:#eff6ff;}
+    .fault-card-header{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;}
+    .fault-cat-badge{font-size:10px;font-weight:600;padding:2px 6px;text-transform:uppercase;letter-spacing:.03em;border:1px solid currentColor;border-radius:2px;}
+    .cat-Track{color:#991b1b;background:#fef2f2;}
+    .cat-Traction{color:#92400e;background:#fffbeb;}
+    .cat-Signal{color:#1e3a8a;background:#eff6ff;}
+    .fault-id{font-size:11px;color:var(--text3);font-family:Consolas,monospace;}
+    .fault-km{font-size:11px;font-weight:600;color:#1e3a8a;font-family:Consolas,monospace;margin-left:auto;white-space:nowrap;}
+    /* keep old class name for JS compat */
+    .fault-km-badge{font-size:11px;font-weight:600;color:#1e3a8a;font-family:Consolas,monospace;margin-left:auto;white-space:nowrap;}
+    .fault-severity{font-size:10px;font-weight:600;padding:1px 6px;border:1px solid currentColor;border-radius:2px;}
+    .sev-CRITICAL{color:#991b1b;background:#fef2f2;}
+    .sev-HIGH{color:#92400e;background:#fffbeb;}
+    .sev-MEDIUM{color:#075985;background:#f0f9ff;}
+    .sev-ROUTINE{color:var(--text3);background:#f9fafb;}
+    .fault-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+    .fault-meta{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .fault-asset-chip{font-size:10px;color:var(--text3);background:#f3f4f6;border:1px solid var(--border);padding:1px 5px;border-radius:2px;}
+    .fault-proximity-pill{font-size:11px;margin-top:6px;padding:3px 8px;display:flex;align-items:center;gap:5px;border:1px solid;border-radius:2px;}
+    .fault-proximity-pill.clusterable{color:#166534;background:#f0fdf4;border-color:#86efac;}
+    .fault-proximity-pill.isolated{color:var(--text3);background:#f9fafb;border-color:var(--border);}
+    .fault-time-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
+    .fault-time-label{font-size:11px;color:var(--text3);white-space:nowrap;}
+    .fault-time-input{width:68px;background:#fff;border:1px solid var(--border2);color:var(--text);padding:4px 7px;font-size:12px;outline:none;border-radius:2px;}
+    .fault-time-input:focus{border-color:var(--accent);}
+    .fault-time-unit{font-size:11px;color:var(--text3);}
+    .btn-save-time{background:#f3f4f6;border:1px solid var(--border2);color:var(--text2);padding:4px 8px;font-size:11px;cursor:pointer;white-space:nowrap;transition:background .1s;border-radius:2px;}
+    .btn-save-time:hover{background:#1e3a8a;border-color:#1e3a8a;color:#fff;}
+
+    /* MERGE SLIDER */
+    .merge-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+    .merge-label{font-size:12px;color:var(--text2);white-space:nowrap;}
+    .merge-slider{flex:1;-webkit-appearance:none;height:3px;background:#cbd5e1;outline:none;}
+    .merge-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#1e3a8a;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #9ca3af;border-radius:50%;}
+    .merge-val{font-size:12px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;min-width:36px;text-align:right;}
+
+    /* COMPUTE BUTTON */
+    .btn-compute{width:100%;background:#1e3a8a;border:none;color:#fff;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:2px;}
+    .btn-compute:hover{background:#1d4ed8;}
+    .btn-compute:disabled{opacity:.45;cursor:not-allowed;}
+    .btn-compute .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+
+    /* PANEL TABS */
+    .panel-tabs{display:flex;border-bottom:2px solid var(--border);background:#fff;}
+    .tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .1s,border-color .1s;white-space:nowrap;user-select:none;}
+    .tab.active{color:#1e3a8a;border-bottom-color:#1e3a8a;font-weight:600;}
+    .tab:hover:not(.active){color:var(--text2);}
+    .tab-content{display:none;flex:1;overflow-y:auto;}
+    .tab-content.active{display:flex;flex-direction:column;}
+
+    /* WEEK CALENDAR */
+    .week-header{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--border);background:#fff;}
+    .week-header h2{font-size:14px;font-weight:600;color:var(--text);}
+    .legend{display:flex;gap:12px;align-items:center;}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);}
+    .legend-dot{width:12px;height:10px;border-radius:1px;}
+    .calendar-grid{padding:0 18px 18px;}
+    .day-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;position:relative;z-index:1;}
+    .day-row:hover{z-index:40;}
+    .day-label{width:60px;font-size:11px;font-weight:600;color:var(--text2);text-align:right;flex-shrink:0;line-height:1.4;}
+    .timeline{flex:1;height:36px;background:#e5e7eb;position:relative;overflow:visible;cursor:pointer;border:1px solid #d1d5db;}
+    .tl-segment{position:absolute;top:0;height:100%;transition:min-width .1s;display:flex;align-items:center;justify-content:center;box-sizing:border-box;cursor:pointer;}
+    .tl-segment:hover{z-index:50!important;min-width:48px;}
+    .tl-occupied{background:#475569;}
+    .tl-free{background:#16a34a;cursor:pointer;}
+    .tl-free:hover{background:#15803d;}
+    .tl-short-gap{background:#fef9c3;border:1px dashed #a16207;}
+    .tl-short-gap:hover{background:#fef08a;}
+    .tl-selected{background:#b45309!important;border:2px solid #78350f!important;z-index:25!important;}
+    .tl-approved{background:#166534;}
+    .tl-rejected{background:#991b1b;}
+    .tl-label{position:relative;font-size:10px;font-weight:600;color:#fff;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;max-width:100%;text-shadow:0 1px 2px rgba(0,0,0,.5);}
+    .tl-segment:hover .tl-label{overflow:visible;text-overflow:clip;}
+
+    /* Tooltip */
+    .tl-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid #9ca3af;color:#111827;padding:6px 10px;font-size:11px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 10px rgba(0,0,0,.12);z-index:1000;flex-direction:column;gap:2px;align-items:flex-start;border-radius:2px;}
+    .tl-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#9ca3af;}
+    .tl-tooltip.tt-left{left:0;transform:none;}
+    .tl-tooltip.tt-left::after{left:10px;transform:none;}
+    .tl-tooltip.tt-right{left:auto;right:0;transform:none;}
+    .tl-tooltip.tt-right::after{left:auto;right:10px;transform:none;}
+    .tl-segment:hover .tl-tooltip{display:flex;}
+
+    /* DIRECTION TOGGLE */
+    .dir-toggle-container{display:inline-flex;background:#f1f5f9;border:1px solid var(--border);padding:2px;gap:2px;}
+    .dir-btn{background:transparent;border:none;color:var(--text3);font-size:11px;font-weight:500;padding:3px 9px;cursor:pointer;transition:background .1s,color .1s;}
+    .dir-btn.active{background:#1e3a8a;color:#fff;font-weight:600;}
+    .dir-btn:hover:not(.active){color:var(--text);}
+
+    /* TIME AXIS */
+    .time-axis{display:flex;align-items:center;gap:10px;margin-bottom:3px;}
+    .time-axis-spacer{width:70px;flex-shrink:0;}
+    .time-axis-labels{flex:1;position:relative;height:14px;}
+    .time-tick{position:absolute;font-size:9px;color:var(--text3);transform:translateX(-50%);}
+
+    /* FAULT GAPS */
+    .gaps-container{padding:14px 18px;}
+    .fault-gap-section{margin-bottom:16px;border:1px solid var(--border);background:#fff;}
+    .fault-gap-title{font-size:12px;font-weight:600;color:var(--text);padding:8px 12px;background:#f9fafb;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+    .day-tabs{display:flex;gap:3px;padding:8px 12px 0;flex-wrap:wrap;}
+    .day-tab{padding:3px 8px;font-size:11px;background:#f3f4f6;border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all .1s;border-radius:2px;}
+    .day-tab.active{background:#1e3a8a;border-color:#1e3a8a;color:#fff;}
+    .gap-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .gap-table th{padding:6px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);border-bottom:1px solid var(--border);background:#f9fafb;}
+    .gap-table td{padding:6px 12px;border-bottom:1px solid #f3f4f6;}
+    .gap-table tr:hover td{background:#f9fafb;}
+    .feasible-yes{color:#166534;font-weight:600;}
+    .feasible-no{color:#991b1b;}
+    .gap-btn{background:#1e3a8a;border:none;color:#fff;padding:3px 8px;font-size:10px;cursor:pointer;transition:background .1s;border-radius:2px;}
+    .gap-btn:hover{background:#1d4ed8;}
+
+    /* PROPOSAL PANEL */
+    .proposal-panel{padding:14px 18px;border-top:1px solid var(--border);background:#fff;}
+    .proposal-header{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text);}
+    .proposal-window{background:#f9fafb;border:1px solid var(--border);padding:10px 12px;margin-bottom:10px;}
+    .pw-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+    .pw-label{font-size:11px;color:var(--text3);}
+    .pw-val{font-size:13px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
+    .impact-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;}
+    .impact-table th{padding:6px 10px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);border-bottom:1px solid var(--border);background:#f9fafb;}
+    .impact-table td{padding:5px 10px;border-bottom:1px solid #f3f4f6;}
+    .impact-table tr:hover td{background:#f9fafb;}
+    .cover-yes{color:#166534;background:#f0fdf4;border:1px solid #86efac;padding:1px 6px;font-size:10px;font-weight:600;display:inline-block;border-radius:2px;}
+    .cover-partial{color:#92400e;background:#fffbeb;border:1px solid #fde68a;padding:1px 6px;font-size:10px;font-weight:600;display:inline-block;border-radius:2px;}
+    .cover-no{color:#991b1b;background:#fef2f2;border:1px solid #fecaca;padding:1px 6px;font-size:10px;font-weight:600;display:inline-block;border-radius:2px;}
+
+    /* AI ANALYSIS SECTION */
+    .ai-section{padding:0 18px 14px;}
+    .btn-ai{background:#1e3a8a;border:1px solid #172554;color:#fff;padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s;margin-bottom:10px;border-radius:2px;}
+    .btn-ai:hover{background:#1d4ed8;}
+    .btn-ai:disabled{opacity:.45;cursor:not-allowed;}
+    .ai-card{background:#fff;border:1px solid var(--border);border-left:3px solid #1e3a8a;padding:12px;display:none;}
+    .ai-card.visible{display:block;}
+    .ai-verdict{font-size:15px;font-weight:700;margin-bottom:6px;}
+    .verdict-FEASIBLE{color:#166534;}
+    .verdict-RISKY{color:#92400e;}
+    .verdict-NOT_FEASIBLE{color:#991b1b;}
+    .ai-summary{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px;}
+    .ai-suggestions{list-style:none;margin-bottom:10px;}
+    .ai-suggestions li{display:flex;gap:6px;font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.5;}
+    .ai-suggestions li::before{content:'–';color:#1e3a8a;flex-shrink:0;}
+    .ai-risk-trains{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+    .risk-train-tag{background:#f3f4f6;border:1px solid var(--border);color:var(--text2);padding:2px 6px;font-size:11px;font-family:Consolas,monospace;border-radius:2px;}
+    .ai-split{background:#fffbeb;border:1px solid #fde68a;padding:8px 10px;font-size:12px;color:#92400e;margin-top:8px;border-radius:2px;}
+
+    /* DECISION PANEL */
+    .decision-panel{margin:0 18px 16px;background:#fff;border:1px solid var(--border);display:none;}
+    .decision-panel.visible{display:block;}
+    .dp-header{background:#f9fafb;padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text);}
+    .dp-body{padding:10px 12px;}
+    .dp-row{margin-bottom:8px;}
+    .dp-label{font-size:11px;color:var(--text3);margin-bottom:3px;}
+    .dp-val{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums;}
+    .notes-input{width:100%;background:#fff;border:1px solid var(--border2);color:var(--text);padding:6px 10px;font-size:12px;resize:vertical;min-height:48px;outline:none;font-family:inherit;border-radius:2px;}
+    .notes-input:focus{border-color:var(--accent);}
+    .decision-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;}
+    .btn-approve{background:#166534;border:none;color:#fff;padding:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;border-radius:2px;}
+    .btn-approve:hover{background:#15803d;}
+    .btn-reject{background:#991b1b;border:none;color:#fff;padding:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;border-radius:2px;}
+    .btn-reject:hover{background:#b91c1c;}
+
+    /* WEEK VIEW */
+    .week-view-grid{padding:14px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+    .wv-day{background:#fff;border:1px solid var(--border);}
+    .wv-day-header{padding:6px 8px;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text3);background:#f9fafb;border-bottom:1px solid var(--border);}
+    .wv-block{margin:4px;padding:4px 7px;font-size:10px;border-radius:1px;}
+    .wv-approved{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+    .wv-scheduled{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+    .wv-rejected{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}
+    .wv-free{background:#f9fafb;border:1px dashed var(--border);color:var(--text3);margin:4px;padding:4px 7px;font-size:10px;}
+    .wv-block-time{font-family:Consolas,monospace;font-size:10px;font-weight:600;}
+
+    /* CLUSTER CARDS */
+    .cluster-card{background:#fff;border:1px solid var(--border);border-left:3px solid #1e3a8a;padding:12px;margin-bottom:6px;}
+    .cluster-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+    .cluster-badge{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;padding:2px 8px;font-size:10px;font-weight:600;text-transform:uppercase;border-radius:2px;}
+    .cluster-badge-standalone{background:#f3f4f6;border:1px solid var(--border);color:var(--text3);padding:2px 8px;font-size:10px;font-weight:600;text-transform:uppercase;border-radius:2px;}
+    .merge-info{font-size:11px;color:#166534;}
+    .cluster-dur{font-size:20px;font-weight:700;color:var(--text);line-height:1.2;}
+    .cluster-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+    .cluster-faults{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+    .cluster-fault-tag{background:#f3f4f6;border:1px solid var(--border);color:var(--text2);padding:2px 6px;font-size:10px;font-family:Consolas,monospace;border-radius:2px;}
+
+    /* TOASTS */
+    #toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:5px;}
+    .toast{background:#fff;border:1px solid var(--border);border-left:4px solid #1e3a8a;padding:10px 14px;font-size:13px;color:var(--text);min-width:240px;animation:slideIn .2s ease;}
+    .toast.success{border-left-color:#166534;}
+    .toast.error{border-left-color:#991b1b;}
+    @keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* EMPTY STATE */
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;padding:40px;text-align:center;color:var(--text3);}
+    .empty-icon{font-size:32px;opacity:.25;}
+    .empty-title{font-size:14px;font-weight:600;color:var(--text2);}
+    .empty-sub{font-size:12px;color:var(--text3);max-width:260px;line-height:1.5;}
+
+    /* TOP WINDOWS */
+    .top-windows{padding:12px 18px;}
+    .tw-card{background:#fff;border:1px solid var(--border);border-left:3px solid #d1d5db;padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:border-left-color .1s,background .1s;}
+    .tw-card:hover{background:#f9fafb;}
+    .tw-card.best{border-left-color:#166534;background:#f0fdf4;}
+    .tw-header{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+    .tw-rank{width:20px;height:20px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text3);border-radius:50%;}
+    .tw-rank.best-rank{background:#166534;color:#fff;}
+    .tw-day{font-size:13px;font-weight:600;color:var(--text);}
+    .tw-time{font-size:12px;font-family:Consolas,monospace;color:#1e3a8a;}
+    .tw-badges{display:flex;gap:4px;flex-wrap:wrap;}
+    .tw-badge{font-size:10px;padding:2px 6px;font-weight:500;border:1px solid;border-radius:2px;}
+    .badge-headroom{color:#166534;background:#f0fdf4;border-color:#86efac;}
+    .badge-penalty{color:#92400e;background:#fffbeb;border-color:#fde68a;}
+    .badge-affected{color:#1e3a8a;background:#eff6ff;border-color:#bfdbfe;}
+    .badge-high{color:#991b1b;background:#fef2f2;border-color:#fecaca;}
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:#d1d5db;}
+    ::-webkit-scrollbar-thumb:hover{background:#9ca3af;}
+  </style>
+
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="ir-box">IR</div>
+    <span class="logo-title">SAMANVAY</span><span class="logo-sep">/</span><span class="logo-sub">Block Scheduler</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="btn-nav">Dashboard</a>
+    <a href="map.html" class="btn-nav">Live Map</a>
+    <a href="block.html" class="btn-nav active">Block Scheduler</a>
+    <a href="degradation.html" class="btn-nav">Degradation Sim</a>
+  </nav>
+  <span id="live-time">--:-- IST</span>
+</div>
+
+<div class="main-grid">
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+    <!-- Corridor -->
+    <div class="sb-section">
+      <div class="sb-title">Corridor</div>
+      <select id="corridor-select" class="corridor-select">
+        <option value="hwh_bwn_main">Howrah – Barddhaman Main Line</option>
+        <option value="hwh_bwn_asn_line">Howrah – Barddhaman – Asansol Line</option>
+        <option value="sdah_knj_line">Sealdah – Krishnanagar Line</option>
+        <option value="hwh_bwn_chord">Howrah – Barddhaman Chord Line</option>
+        <option value="all">All Corridors (Entire Division — 11 Faults)</option>
+      </select>
+    </div>
+
+    <!-- Faults -->
+    <div class="sb-section" style="flex:1;overflow-y:auto;">
+      <div class="sb-title">Faults <span id="fault-count" style="color:var(--accent);font-size:10px;margin-left:4px;"></span></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Enter required block time per fault. Select faults to schedule.</div>
+      <div id="fault-list">
+        <div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-sub">Loading faults...</div></div>
+      </div>
+    </div>
+
+    <!-- Merge Config -->
+    <div class="sb-section">
+      <div class="sb-title">Merge Distance</div>
+      <div class="merge-row">
+        <span class="merge-label">Cluster faults within</span>
+        <input type="range" class="merge-slider" id="merge-slider" min="2" max="50" value="15" oninput="updateMergeSlider(this)"/>
+        <span class="merge-val" id="merge-val">15 km</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;">Faults within this distance will be merged. Block duration = MAX of individual times.</div>
+      <button class="btn-compute" id="btn-compute" onclick="computeWindows()" disabled>
+        <span id="compute-icon"></span>
+        <span id="compute-text">Compute Windows</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── MAIN PANEL ── -->
+  <div class="panel">
+    <div class="panel-tabs">
+      <div class="tab active" onclick="switchTab('calendar')" id="tab-calendar">Week Calendar</div>
+      <div class="tab" onclick="switchTab('faultgaps')" id="tab-faultgaps">Fault-Specific Gaps</div>
+      <div class="tab" onclick="switchTab('topwindows')" id="tab-topwindows">Best Windows</div>
+      <div class="tab" onclick="switchTab('weekview')" id="tab-weekview">Strategic View</div>
+    </div>
+
+    <!-- Calendar Tab -->
+    <div class="tab-content active" id="tab-content-calendar">
+      <div class="week-header">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h2>Corridor Whitespace — Mon to Sun</h2>
+          <div class="dir-toggle-container">
+            <button class="dir-btn active" id="dir-btn-up" onclick="setTrackDirection('UP')">UP Line</button>
+            <button class="dir-btn" id="dir-btn-down" onclick="setTrackDirection('DOWN')">DN Line</button>
+            <button class="dir-btn" id="dir-btn-all" onclick="setTrackDirection('ALL')">Both</button>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(51,65,85,.8)"></div>Train Occupied</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,.7)"></div>Feasible Gap</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(245,158,11,.3);border:1px dashed var(--amber)"></div>Tight Gap (< Req)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,1)"></div>Approved Block</div>
+        </div>
+      </div>
+      <div class="calendar-grid">
+        <div class="time-axis">
+          <div class="time-axis-spacer"></div>
+          <div class="time-axis-labels" id="time-axis"></div>
+        </div>
+        <div id="calendar-rows">
+          <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No data yet</div><div class="empty-sub">Select faults, enter required times, and click Compute Windows to see the corridor whitespace view.</div></div>
+        </div>
+      </div>
+
+      <!-- Merge Cluster Cards -->
+      <div id="cluster-section" style="padding:0 20px 16px;display:none;">
+        <div class="sb-title" style="margin-bottom:10px;">Fault Merge Result</div>
+        <div id="cluster-cards"></div>
+      </div>
+    </div>
+
+    <!-- Fault-Specific Gaps Tab -->
+    <div class="tab-content" id="tab-content-faultgaps">
+      <div class="gaps-container">
+        <div id="fault-gaps-content">
+          <div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">No gap analysis yet</div><div class="empty-sub">Run Compute Windows to see station-specific gaps for each fault location.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Windows Tab -->
+    <div class="tab-content" id="tab-content-topwindows">
+      <div style="padding:16px 20px;">
+        <h2 style="font-size:16px;font-weight:700;margin-bottom:4px;">Best Candidate Windows</h2>
+        <p style="font-size:12px;color:var(--text3);">Ranked by lowest train impact penalty. Click any window to select it for scheduling.</p>
+      </div>
+      <div class="top-windows" id="top-windows-list">
+        <div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-title">No windows computed</div><div class="empty-sub">Run Compute Windows first.</div></div>
+      </div>
+    </div>
+
+    <!-- Strategic Week View -->
+    <div class="tab-content" id="tab-content-weekview">
+      <div style="padding:16px 20px;">
+        <h2 style="font-size:16px;font-weight:700;margin-bottom:4px;">Strategic Week View</h2>
+        <p style="font-size:12px;color:var(--text3);">All approved, scheduled, and rejected maintenance blocks across the week.</p>
+      </div>
+      <div class="week-view-grid" id="week-view-grid">
+        <div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No blocks scheduled</div><div class="empty-sub">Approve or schedule blocks to see them here.</div></div>
+      </div>
+    </div>
+
+    <!-- Proposal + AI + Decision — always at bottom of visible area when a window is selected -->
+    <div id="proposal-area" style="border-top:1px solid var(--border);display:none;">
+      <!-- Proposal -->
+      <div class="proposal-panel">
+        <div class="proposal-header">Proposed Maintenance Window</div>
+        <div class="proposal-window">
+          <div class="pw-row"><span class="pw-label">Day</span><span class="pw-val" id="pw-day">—</span></div>
+          <div class="pw-row"><span class="pw-label">Window</span><span class="pw-val" id="pw-window">—</span></div>
+          <div class="pw-row"><span class="pw-label">Duration</span><span class="pw-val" id="pw-dur">—</span></div>
+          <div class="pw-row"><span class="pw-label">Headroom</span><span class="pw-val" id="pw-headroom" style="color:var(--green)">—</span></div>
+          <div class="pw-row"><span class="pw-label">Penalty Score</span><span class="pw-val" id="pw-penalty" style="color:var(--amber)">—</span></div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Affected Trains</div>
+        <div style="max-height:200px;overflow-y:auto;margin-bottom:4px;">
+          <table class="impact-table">
+            <thead><tr><th>Train</th><th>Type</th><th>Priority</th><th>Overlap</th><th>Can Cover?</th></tr></thead>
+            <tbody id="impact-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- AI -->
+      <div class="ai-section">
+        <button class="btn-ai" id="btn-ai" onclick="callAI()">
+          Request AI Analysis (DeepSeek R1)
+        </button>
+        <div class="ai-card" id="ai-card">
+          <div class="ai-verdict" id="ai-verdict"></div>
+          <div class="ai-summary" id="ai-summary"></div>
+          <div id="ai-risk-trains-row" style="margin-bottom:10px;display:none;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;">High-Risk Trains</div>
+            <div class="ai-risk-trains" id="ai-risk-trains"></div>
+          </div>
+          <div id="ai-suggestions-row" style="margin-bottom:10px;display:none;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;">Recommendations</div>
+            <ul class="ai-suggestions" id="ai-suggestions"></ul>
+          </div>
+          <div class="ai-split" id="ai-split" style="display:none;"></div>
+        </div>
+      </div>
+      <!-- Decision -->
+      <div class="decision-panel visible" id="decision-panel">
+        <div class="dp-header">Divisional Manager Decision</div>
+        <div class="dp-body">
+          <div class="dp-row">
+            <div class="dp-label">Proposed Block</div>
+            <div class="dp-val" id="dp-summary">—</div>
+          </div>
+          <div class="dp-row">
+            <div class="dp-label">Manager Notes (optional)</div>
+            <textarea class="notes-input" id="manager-notes" placeholder="Add notes for the record..."></textarea>
+          </div>
+          <div class="decision-btns">
+            <button class="btn-approve" id="btn-approve" onclick="submitDecision('approved')">Approve Block</button>
+            <button class="btn-reject" id="btn-reject" onclick="submitDecision('rejected')">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let state = {
+  faults: [],
+  selectedFaultIds: new Set(),
+  timeOverrides: {},       // fault_id -> minutes (number)
+  mergeKm: 15,
+  corridorId: 'hwh_bwn_main',
+  corridorName: 'Howrah – Barddhaman Main Line',
+  computeResult: null,
+  selectedWindow: null,   // {day, gap_start, gap_end, gap_start_min, gap_end_min, ...}
+  selectedCluster: null,  // the cluster object matching selectedFaultIds
+  aiResult: null,
+  scheduledBlocks: [],
+  perFaultGapDay: {},      // fault_id -> currently viewed day for the tab
+};
+
+const CORRIDOR_NAMES = {
+  'all': 'All Corridors (Division-Wide)',
+  'hwh_bwn_main': 'Howrah – Barddhaman Main Line',
+  'hwh_bwn_asn_line': 'Howrah – Barddhaman – Asansol Line',
+  'sdah_knj_line': 'Sealdah – Krishnanagar Line',
+  'hwh_bwn_chord': 'Howrah – Barddhaman Chord Line',
+  'hwh_skg_line': 'Howrah – Saktigarh Line',
+  'bly_bwn_asn_trunk': 'Bally – Asansol Trunk Line',
+};
+
+// ── LIVE CLOCK ────────────────────────────────────────────────────────────────
+function updateClock() {
+  const el = document.getElementById('live-time');
+  const now = new Date();
+  const ist = new Date(now.getTime() + (5.5 * 3600000) - (now.getTimezoneOffset() * 60000));
+  el.textContent = ist.toTimeString().slice(0,5) + ' IST';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info', dur = 3500) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; t.style.transition = 'all .3s'; setTimeout(() => t.remove(), 350); }, dur);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('tab-content-' + name).classList.add('active');
+}
+
+const CORRIDOR_FAULTS_MAP = {
+  'all': ['hwh_bwn_main', 'hwh_bwn_chord', 'sdah_knj_line', 'bwn_asn_trunk', 'hwh_bwn_asn_line', 'bly_bwn_asn_trunk', 'hwh_skg_line'],
+  'hwh_bwn_main': ['hwh_bwn_main'],
+  'hwh_bwn_asn_line': ['bwn_asn_trunk', 'hwh_bwn_asn_line'],
+  'bly_bwn_asn_trunk': ['bwn_asn_trunk', 'bly_bwn_asn_trunk'],
+  'sdah_knj_line': ['sdah_knj_line'],
+  'hwh_skg_line': ['hwh_bwn_main', 'hwh_skg_line'],
+  'hwh_bwn_chord': ['hwh_bwn_chord'],
+};
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return 999.0;
+  const R = 6371.0;
+  const p1 = lat1 * Math.PI / 180;
+  const p2 = lat2 * Math.PI / 180;
+  const dp = (lat2 - lat1) * Math.PI / 180;
+  const dl = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ── CORRIDOR CHANGE ───────────────────────────────────────────────────────────
+document.getElementById('corridor-select').addEventListener('change', function() {
+  state.corridorId = this.value;
+  state.corridorName = CORRIDOR_NAMES[this.value] || this.value;
+  state.selectedFaultIds = new Set();
+  state.computeResult = null;
+  state.selectedWindow = null;
+  document.getElementById('btn-compute').disabled = true;
+  const propArea = document.getElementById('proposal-area');
+  if (propArea) propArea.style.display = 'none';
+  loadFaults();
+});
+
+// ── MERGE SLIDER ──────────────────────────────────────────────────────────────
+function updateMergeSlider(el) {
+  state.mergeKm = parseFloat(el.value);
+  document.getElementById('merge-val').textContent = state.mergeKm + ' km';
+  const pct = ((el.value - el.min) / (el.max - el.min) * 100) + '%';
+  el.style.setProperty('--pct', pct);
+  // Re-render fault cards so proximity indicators reflect new merge distance
+  if (state.faults && state.faults.length) {
+    renderFaultList();
+  }
+}
+updateMergeSlider(document.getElementById('merge-slider'));
+
+// ── LOAD FAULTS ───────────────────────────────────────────────────────────────
+async function loadFaults() {
+  const sel = document.getElementById('corridor-select');
+  if (sel && sel.value) {
+    state.corridorId = sel.value;
+    state.corridorName = CORRIDOR_NAMES[sel.value] || sel.value;
+  }
+  const listEl = document.getElementById('fault-list');
+  listEl.innerHTML = '<div class="empty-state"><div class="empty-sub">Loading faults...</div></div>';
+  try {
+    const url = `/api/block-scheduler/faults?corridor_id=${encodeURIComponent(state.corridorId)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (state.corridorId === 'all') {
+      state.faults = data.faults || [];
+    } else {
+      const validCids = CORRIDOR_FAULTS_MAP[state.corridorId] || [state.corridorId];
+      state.faults = (data.faults || []).filter(f => validCids.includes(f.corridor_id));
+    }
+    
+    // Sort faults sequentially along track chainage so human can read along the corridor
+    state.faults.sort((a, b) => (a.km_mark || 0) - (b.km_mark || 0));
+
+    // Auto-select the corridor's faults
+    state.selectedFaultIds = new Set(state.faults.map(f => f.id));
+    
+    renderFaultList();
+    loadScheduledBlocks();
+    document.getElementById('fault-count').textContent = `(${state.faults.length})`;
+    updateComputeButton();
+
+    if (state.selectedFaultIds.size > 0) {
+      computeWindows();
+    }
+  } catch(e) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-sub" style="color:var(--red)">Failed to load faults: ' + e.message + '</div></div>';
+  }
+}
+
+function renderFaultList() {
+  const listEl = document.getElementById('fault-list');
+  if (!state.faults.length) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-sub">No faults found on this corridor.</div></div>';
+    return;
+  }
+  listEl.innerHTML = state.faults.map(f => {
+    const selected = state.selectedFaultIds.has(f.id);
+    const override = state.timeOverrides[f.id] || f.required_min_override || f.required_block_duration_min || 60;
+    const kmStr = f.chainage || (f.km_mark ? `KM ${f.km_mark}` : 'KM --');
+
+    // Centralized proximity metric: find closest other fault on this corridor
+    let closestDist = Infinity;
+    let closestFault = null;
+    state.faults.forEach(of => {
+      if (of.id !== f.id && of.corridor_id === f.corridor_id) {
+        const d = haversineKm(f.lat, f.long, of.lat, of.long);
+        if (d < closestDist) {
+          closestDist = d;
+          closestFault = of;
+        }
+      }
+    });
+
+    let proximityHtml = '';
+    if (closestFault && closestDist <= state.mergeKm) {
+      proximityHtml = `<div class="fault-proximity-pill clusterable">
+        <span>🔗</span>
+        <span><b>${closestDist.toFixed(1)} km</b> to ${closestFault.id} (${closestFault.category}) — Merge Candidate</span>
+      </div>`;
+    } else if (closestFault) {
+      proximityHtml = `<div class="fault-proximity-pill isolated">
+        <span>📍</span>
+        <span><b>${closestDist.toFixed(1)} km</b> to nearest fault (${closestFault.id})</span>
+      </div>`;
+    } else {
+      proximityHtml = `<div class="fault-proximity-pill isolated">
+        <span>📍</span>
+        <span>Single fault on corridor</span>
+      </div>`;
+    }
+
+    return `<div class="fault-card ${selected ? 'selected' : ''}" id="fc-${f.id}" onclick="toggleFault('${f.id}')">
+      <div class="fault-card-header">
+        <span class="fault-cat-badge cat-${f.category}">${f.category}</span>
+        <span class="fault-id">${f.id}</span>
+        <span class="fault-km-badge">${kmStr}</span>
+        <span class="fault-severity sev-${f.severity}">${f.severity}</span>
+      </div>
+      <div class="fault-name">${f.fault_type}</div>
+      <div class="fault-meta">
+        <span>${f.location_name || f.nearest_station}</span>
+        ${f.asset_tag ? `<span class="fault-asset-chip">${f.asset_tag}</span>` : ''}
+      </div>
+      ${proximityHtml}
+      <div class="fault-time-row" onclick="event.stopPropagation()">
+        <span class="fault-time-label">Time Required:</span>
+        <input type="number" class="fault-time-input" id="ti-${f.id}" value="${override}" min="5" max="480" placeholder="min"
+          onchange="onTimeChange('${f.id}', '${f.category}', '${f.corridor_id || state.corridorId}')"/>
+        <span class="fault-time-unit">min</span>
+        <button class="btn-save-time" onclick="saveTimeOverride('${f.id}', '${f.category}', '${f.corridor_id || state.corridorId}')">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateComputeButton();
+}
+
+function toggleFault(faultId) {
+  if (state.selectedFaultIds.has(faultId)) {
+    state.selectedFaultIds.delete(faultId);
+  } else {
+    state.selectedFaultIds.add(faultId);
+  }
+  renderFaultList();
+}
+
+function onTimeChange(faultId, category, corridorId) {
+  const val = parseInt(document.getElementById('ti-' + faultId)?.value || 0);
+  if (val > 0) state.timeOverrides[faultId] = val;
+}
+
+async function saveTimeOverride(faultId, category, corridorId) {
+  const val = parseInt(document.getElementById('ti-' + faultId)?.value || 0);
+  if (!val || val < 1) { toast('Enter a valid time in minutes', 'error'); return; }
+  state.timeOverrides[faultId] = val;
+  try {
+    const res = await fetch('/api/block-scheduler/set-time-requirements', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ corridor_id: corridorId, fault_id: faultId, category, override_min: val, set_by: 'engineer' })
+    });
+    const d = await res.json();
+    if (d.success) toast(`Saved: ${faultId} = ${val} min`, 'success');
+    else toast('Save failed', 'error');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+function updateComputeButton() {
+  const btn = document.getElementById('btn-compute');
+  btn.disabled = state.selectedFaultIds.size === 0;
+}
+
+// ── COMPUTE WINDOWS ───────────────────────────────────────────────────────────
+async function computeWindows() {
+  if (!state.selectedFaultIds.size) { toast('Select at least one fault', 'error'); return; }
+
+  const btn = document.getElementById('btn-compute');
+  const icon = document.getElementById('compute-icon');
+  const text = document.getElementById('compute-text');
+  btn.disabled = true;
+  icon.innerHTML = '<div class="spinner" style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></div>';
+  text.textContent = 'Computing...';
+
+  // Collect block duration (max of selected faults' time requirements)
+  let blockDur = 0;
+  for (const fid of state.selectedFaultIds) {
+    const val = state.timeOverrides[fid] || parseInt(document.getElementById('ti-' + fid)?.value || 0) || 60;
+    if (val > blockDur) blockDur = val;
+  }
+
+  try {
+    const payload = {
+      corridor_id: state.corridorId,
+      selected_fault_ids: [...state.selectedFaultIds],
+      block_duration_min: blockDur,
+      merge_km: state.mergeKm,
+      time_overrides: state.timeOverrides,
+      direction: state.direction || 'UP'
+    };
+    const res = await fetch('/api/block-scheduler/compute-windows', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    state.computeResult = data;
+    renderComputeResults(data);
+    switchTab('calendar');
+    toast(`Computed! ${data.generic_week?.week?.monday?.feasible_gaps?.length >= 0 ? 'See calendar for free windows.' : ''}`, 'success');
+  } catch(e) {
+    toast('Compute failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    icon.textContent = '⚡';
+    text.textContent = 'Compute Windows';
+  }
+}
+
+function setTrackDirection(dir) {
+  state.direction = dir;
+  document.querySelectorAll('.dir-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById('dir-btn-' + dir.toLowerCase());
+  if (activeBtn) activeBtn.classList.add('active');
+  computeWindows();
+}
+
+function formatMinDur(min) {
+  if (!min || min <= 0) return '0m';
+  if (min < 60) return min + 'm';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+// ── RENDER COMPUTE RESULTS ────────────────────────────────────────────────────
+function renderComputeResults(data) {
+  renderCalendar(data.generic_week);
+  renderClusters(data.merge_result);
+  renderFaultGaps(data.per_fault_gaps);
+  renderTopWindows(data.top_windows || []);
+  loadScheduledBlocks();
+}
+
+// ── CALENDAR RENDER ───────────────────────────────────────────────────────────
+function renderTimeAxis() {
+  const el = document.getElementById('time-axis');
+  el.innerHTML = '';
+  for (let h = 0; h <= 24; h += 3) {
+    const tick = document.createElement('span');
+    tick.className = 'time-tick';
+    tick.style.left = (h / 24 * 100) + '%';
+    tick.textContent = h === 24 ? '24:00' : `${String(h).padStart(2,'0')}:00`;
+    el.appendChild(tick);
+  }
+}
+
+function renderCalendar(weekData) {
+  renderTimeAxis();
+  const rows = document.getElementById('calendar-rows');
+  if (!weekData || !weekData.week) { rows.innerHTML = '<div class="empty-state"><div class="empty-sub">No data</div></div>'; return; }
+
+  const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  rows.innerHTML = days.map(day => {
+    const d = weekData.week[day] || {};
+    const occupiedSegs = (d.occupied_intervals || []).map(i => {
+      const left = (i.start_min / 1440 * 100).toFixed(2);
+      const width = ((i.end_min - i.start_min) / 1440 * 100).toFixed(2);
+      const dur = i.end_min - i.start_min;
+      const durStr = formatMinDur(dur);
+      const ttClass = i.start_min < 120 ? 'tt-left' : (i.end_min > 1320 ? 'tt-right' : '');
+      return `<div class="tl-segment tl-occupied" style="left:${left}%;width:${width}%;">
+        <span class="tl-label">🚆 ${i.start}–${i.end}</span>
+        <div class="tl-tooltip ${ttClass}">
+          <div style="font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;">🚆 Train Occupied Window</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:var(--text2);">${i.start} – ${i.end} (${durStr})</div>
+          <div style="font-size:10px;color:var(--text3);">No maintenance block permitted during active traffic</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const freeSegs = (d.free_gaps || []).map((g, gi) => {
+      const isFeas = g.feasible;
+      const segClass = isFeas ? 'tl-free' : 'tl-short-gap';
+      const click = `onclick="selectWindowFromCalendar('${day}', ${g.gap_start_min}, ${g.gap_end_min}, '${g.gap_start}', '${g.gap_end}', ${g.gap_duration_min}, ${g.headroom_min})"`;
+      const durStr = formatMinDur(g.gap_duration_min);
+      const label = isFeas ? `✓ ${durStr}` : `${durStr}`;
+      const left = (g.gap_start_min / 1440 * 100).toFixed(2);
+      const width = ((g.gap_end_min - g.gap_start_min) / 1440 * 100).toFixed(2);
+      const ttClass = g.gap_start_min < 120 ? 'tt-left' : (g.gap_end_min > 1320 ? 'tt-right' : '');
+      const badge = isFeas 
+        ? `<span style="color:var(--green);font-weight:700;">✓ FEASIBLE (+${g.headroom_min}m headroom)</span>`
+        : `<span style="color:var(--amber);font-weight:700;">⏳ Tight Gap (${g.gap_duration_min}m < ${g.required_min}m req.)</span>`;
+      return `<div class="tl-segment ${segClass}" style="left:${left}%;width:${width}%;z-index:2;" ${click}>
+        <span class="tl-label">${label}</span>
+        <div class="tl-tooltip ${ttClass}">
+          <div style="font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;">${isFeas ? '🟢' : '⏳'} Free Track Gap</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:var(--text2);">${g.gap_start} – ${g.gap_end} (${durStr})</div>
+          <div style="font-size:10px;">${badge}</div>
+          <div style="font-size:9.5px;color:var(--text3);margin-top:2px;">Click to select and evaluate window</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Approved blocks for this day
+    const approvedSegs = state.scheduledBlocks
+      .filter(b => b.day_of_week === day && b.manager_decision === 'approved')
+      .map(b => {
+        const s = hhmm2min(b.block_start), e = hhmm2min(b.block_end);
+        const left = (s / 1440 * 100).toFixed(2);
+        const width = ((e - s) / 1440 * 100).toFixed(2);
+        const ttClass = s < 120 ? 'tt-left' : (e > 1320 ? 'tt-right' : '');
+        return `<div class="tl-segment tl-approved" style="left:${left}%;width:${width}%;z-index:4;">
+          <span class="tl-label">✓ ${b.block_start}</span>
+          <div class="tl-tooltip ${ttClass}">
+            <div style="font-weight:700;color:var(--green);">✅ APPROVED MAINTENANCE BLOCK</div>
+            <div style="font-family:'JetBrains Mono',monospace;color:var(--text);">${b.block_start} – ${b.block_end}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+    const dayLabel = day.slice(0,3).toUpperCase();
+    const hasGaps = d.feasible_gaps && d.feasible_gaps.length > 0;
+    return `<div class="day-row">
+      <div class="day-label" style="${hasGaps ? 'color:var(--green)' : ''}">${dayLabel}<br><span style="font-size:10px;color:var(--text3)">${d.active_train_count || 0}T</span></div>
+      <div class="timeline">${occupiedSegs}${freeSegs}${approvedSegs}</div>
+    </div>`;
+  }).join('');
+}
+
+function hhmm2min(s) {
+  if (!s) return 0;
+  const p = s.split(':');
+  return parseInt(p[0])*60 + parseInt(p[1]);
+}
+
+function selectWindowFromCalendar(day, startMin, endMin, startStr, endStr, dur, headroom) {
+  state.selectedWindow = { day, gap_start_min: startMin, gap_end_min: endMin, gap_start: startStr, gap_end: endStr, gap_duration_min: dur, headroom_min: headroom };
+  renderProposalPanel(state.selectedWindow);
+  toast(`Window selected: ${day} ${startStr}–${endStr} (${dur} min)`, 'info');
+  // Reset AI
+  state.aiResult = null;
+  document.getElementById('ai-card').classList.remove('visible');
+}
+
+// ── CLUSTERS ──────────────────────────────────────────────────────────────────
+function renderClusters(mergeResult) {
+  const section = document.getElementById('cluster-section');
+  const cards = document.getElementById('cluster-cards');
+  if (!mergeResult) { section.style.display = 'none'; return; }
+  const all = [...(mergeResult.clusters || []), ...(mergeResult.standalone || [])];
+  if (!all.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  cards.innerHTML = all.map(c => `
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <span class="${c.merged ? 'cluster-badge' : 'cluster-badge-standalone'}">${c.merged ? 'MERGED' : 'STANDALONE'}</span>
+        ${c.merged ? `<span class="merge-info">Merged ${c.fault_count} faults — saves ${c.time_saved_min} min</span>` : ''}
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:8px;">
+        <div><div class="cluster-dur">${c.block_duration_min} min</div><div class="cluster-sub">Block Duration Required</div></div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.8;">
+          <div>Individual: ${c.individual_durations.join(' + ')} min</div>
+          <div>Stations: ${c.nearest_stations.join(' → ')}</div>
+          ${c.max_span_km ? `<div>Span: ${c.max_span_km} km</div>` : ''}
+        </div>
+      </div>
+      <div class="cluster-faults">${c.faults.map(f => `<span class="cluster-fault-tag">${f.id}: ${f.required_min}m</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+// ── FAULT-SPECIFIC GAPS ───────────────────────────────────────────────────────
+function renderFaultGaps(perFaultGaps) {
+  const el = document.getElementById('fault-gaps-content');
+  if (!perFaultGaps || !Object.keys(perFaultGaps).length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-sub">No gap data.</div></div>';
+    return;
+  }
+  const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  el.innerHTML = Object.entries(perFaultGaps).map(([faultId, dayData]) => {
+    const fault = state.faults.find(f => f.id === faultId) || {};
+    if (!state.perFaultGapDay[faultId]) state.perFaultGapDay[faultId] = 'monday';
+    const curDay = state.perFaultGapDay[faultId];
+    const dayResult = dayData[curDay] || {};
+    const gaps = dayResult.all_gaps || [];
+    return `<div class="fault-gap-section">
+      <div class="fault-gap-title">
+        <span class="fault-cat-badge cat-${fault.category || ''}">${fault.category || faultId}</span>
+        ${faultId} — ${fault.location_name || fault.nearest_station || ''}
+        <span style="font-size:11px;color:var(--text3);">Required: ${dayResult.block_duration_required_min || '?'} min | Trains in section: ${dayResult.train_count_in_section || 0}</span>
+      </div>
+      <div class="day-tabs">
+        ${days.map(d => `<div class="day-tab ${d === curDay ? 'active' : ''}" onclick="switchFaultGapDay('${faultId}', '${d}')">${d.slice(0,3).toUpperCase()}</div>`).join('')}
+      </div>
+      ${gaps.length === 0 ? '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No gaps found — corridor fully occupied on this day at this section.</div>' :
+        `<table class="gap-table">
+          <thead><tr><th>Gap Window</th><th>Duration</th><th>Headroom</th><th>Feasible?</th><th>Train Before → After</th><th>Action</th></tr></thead>
+          <tbody>${gaps.map(g => `<tr>
+            <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);">${g.gap_start} – ${g.gap_end}</td>
+            <td>${g.gap_duration_min} min</td>
+            <td style="${g.headroom_min > 0 ? 'color:var(--green)' : 'color:var(--red)'};">${g.headroom_min > 0 ? '+' + g.headroom_min + ' min' : 'None'}</td>
+            <td>${g.feasible ? '<span class="feasible-yes">✓ YES</span>' : '<span class="feasible-no">✗ NO</span>'}</td>
+            <td style="font-size:11px;color:var(--text3);">${g.train_before_name} → ${g.train_after_name}</td>
+            <td>${g.feasible ? `<button class="gap-btn" onclick="selectWindowFromGap('${curDay}', ${g.gap_start_min}, ${g.gap_end_min}, '${g.gap_start}', '${g.gap_end}', ${g.gap_duration_min}, ${g.headroom_min})">Select</button>` : '—'}</td>
+          </tr>`).join('')}</tbody>
+        </table>`}
+    </div>`;
+  }).join('');
+}
+
+function switchFaultGapDay(faultId, day) {
+  state.perFaultGapDay[faultId] = day;
+  renderFaultGaps(state.computeResult?.per_fault_gaps || {});
+}
+
+function selectWindowFromGap(day, startMin, endMin, startStr, endStr, dur, headroom) {
+  selectWindowFromCalendar(day, startMin, endMin, startStr, endStr, dur, headroom);
+  switchTab('calendar');
+}
+
+// ── TOP WINDOWS ───────────────────────────────────────────────────────────────
+function renderTopWindows(topWindows) {
+  const el = document.getElementById('top-windows-list');
+  if (!topWindows.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-sub">No feasible windows found.<br>Try reducing block time or adjusting fault selection.</div></div>';
+    return;
+  }
+  el.innerHTML = topWindows.map((w, i) => {
+    const impact = w.impact || {};
+    const isBest = i === 0;
+    return `<div class="tw-card ${isBest ? 'best' : ''}" onclick="selectWindowFromCalendar('${w.day}', ${w.gap_start_min}, ${w.gap_end_min}, '${w.gap_start}', '${w.gap_end}', ${w.gap_duration_min}, ${w.headroom_min})">
+      <div class="tw-header">
+        <div class="tw-rank ${isBest ? 'best-rank' : ''}">${isBest ? '#1' : i+1}</div>
+        <div class="tw-day">${w.day.charAt(0).toUpperCase()+w.day.slice(1)}</div>
+        <div class="tw-time">${w.gap_start} – ${w.gap_end}</div>
+      </div>
+      <div class="tw-badges">
+        <span class="tw-badge badge-headroom">+${w.headroom_min} min headroom</span>
+        <span class="tw-badge badge-penalty">Penalty: ${impact.total_penalty_score || 0}</span>
+        <span class="tw-badge badge-affected">${impact.affected_train_count || 0} trains</span>
+        ${impact.high_priority_affected ? `<span class="tw-badge badge-high">⚠ ${impact.high_priority_affected} high-prio</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PROPOSAL PANEL ────────────────────────────────────────────────────────────
+async function renderProposalPanel(w) {
+  document.getElementById('proposal-area').style.display = 'block';
+  document.getElementById('pw-day').textContent = w.day.charAt(0).toUpperCase() + w.day.slice(1);
+  document.getElementById('pw-window').textContent = `${w.gap_start} – ${w.gap_end}`;
+  document.getElementById('pw-dur').textContent = `${w.gap_duration_min} min`;
+  document.getElementById('pw-headroom').textContent = `+${w.headroom_min} min`;
+  document.getElementById('dp-summary').textContent = `${w.day.charAt(0).toUpperCase()+w.day.slice(1)}, ${w.gap_start}–${w.gap_end} (${w.gap_duration_min} min)`;
+
+  // Fetch impact
+  try {
+    const res = await fetch(`/api/block-scheduler/compute-windows`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        corridor_id: state.corridorId,
+        selected_fault_ids: [...state.selectedFaultIds],
+        block_duration_min: w.gap_duration_min,
+        merge_km: state.mergeKm,
+        time_overrides: state.timeOverrides,
+      })
+    });
+    // Use score_window_impact directly
+  } catch(e) {}
+
+  // Score impact for the specific window via fast API
+  try {
+    const impRes = await fetch('/api/block-scheduler/score-impact', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        corridor_id: state.corridorId,
+        window_day: w.day,
+        window_start_min: w.gap_start_min,
+        window_end_min: w.gap_end_min,
+        block_duration_min: buildClusterInfo().block_duration_min || w.gap_duration_min,
+      })
+    });
+    const impD = await impRes.json();
+    const impact = impD.impact || {};
+    document.getElementById('pw-penalty').textContent = impact.total_penalty_score || 0;
+    renderImpactTable(impact.affected_trains || []);
+    syncActiveAdvisory(w, impact);
+  } catch(e) {
+    document.getElementById('pw-penalty').textContent = '—';
+  }
+}
+
+function syncActiveAdvisory(w, impact) {
+  if (!w) w = state.selectedWindow;
+  if (!w) return;
+  const cluster = buildClusterInfo();
+  const reqDur = cluster.block_duration_min || 90;
+  const timeSaved = cluster.time_saved_min || 0;
+  const indDurs = cluster.individual_durations || [reqDur];
+  const indSum = indDurs.reduce((a,b)=>a+b, 0) || (reqDur + timeSaved);
+  const effPct = indSum > 0 ? Math.round(((indSum - reqDur) / indSum) * 100) : 0;
+  const aff = (impact && impact.affected_trains) ? impact.affected_trains : (state.lastImpactTrains || []);
+  state.lastImpactTrains = aff;
+
+  const advData = {
+    corridor_id: state.corridorId,
+    corridor_name: state.corridorName,
+    cluster_id: cluster.cluster_id || 'CLU-01',
+    fault_count: cluster.fault_count || state.selectedFaultIds.size,
+    faults: cluster.faults || [],
+    requested_block_min: reqDur,
+    time_saved_min: timeSaved,
+    individual_durations: indDurs,
+    efficiency_pct: effPct,
+    window_day: w.day,
+    window_start: w.gap_start,
+    window_end: w.gap_end,
+    available_gap_min: w.gap_duration_min,
+    headroom_min: w.headroom_min,
+    affected_trains: aff,
+    affected_train_count: aff.length,
+    total_penalty_score: impact ? (impact.total_penalty_score || 0) : 0,
+    is_approved: state.isApproved || false,
+    updated_at: Date.now(),
+  };
+
+  localStorage.setItem('samanvay_active_advisory', JSON.stringify(advData));
+  try {
+    fetch('/api/block-scheduler/active-advisory', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(advData)
+    });
+  } catch(e) {}
+}
+
+function buildClusterInfo() {
+  if (!state.computeResult) return { cluster_id: 'CLU-01', fault_count: state.selectedFaultIds.size, block_duration_min: 60, time_saved_min: 0, faults: [] };
+  const mr = state.computeResult.merge_result;
+  const all = [...(mr?.clusters||[]),...(mr?.standalone||[])];
+  return all[0] || { cluster_id: 'CLU-01', fault_count: state.selectedFaultIds.size, block_duration_min: 60, time_saved_min: 0, faults: [] };
+}
+
+function renderImpactTable(trains) {
+  const tbody = document.getElementById('impact-table-body');
+  if (!trains.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:12px;">No trains affected in this window.</td></tr>'; return; }
+  tbody.innerHTML = trains.slice(0,15).map(t => {
+    const cov = t.gap_coverage_min || 0;
+    let badge = '';
+    if (t.can_cover_overlap || (cov >= t.overlap_min && cov > 0)) {
+      badge = `<span class="cover-yes" title="Slack (${cov}m) covers overlap (${t.overlap_min}m)">Full (${cov}m)</span>`;
+    } else if (t.can_cover_deficit || (cov >= 35 && cov > 0)) {
+      badge = `<span class="cover-yes" title="Slack (${cov}m) covers deficit (${t.block_deficit_min || 35}m)">Deficit (${cov}m)</span>`;
+    } else if (cov > 0) {
+      const abs = t.absorbable_min || Math.min(cov, t.overlap_min);
+      badge = `<span class="cover-partial" title="Timetable slack (${cov}m) absorbs ${abs}m delay against ${t.overlap_min}m overlap">Partial (${cov}m)</span>`;
+    } else {
+      badge = `<span class="cover-no" title="No timetable slack recorded">None (0m)</span>`;
+    }
+    return `<tr>
+      <td style="font-family:Consolas,monospace;font-size:11px;color:#1e3a8a;">${t.train_number}<br><span style="color:#6b7280;font-size:10px;">${(t.train_name||'').slice(0,22)}</span></td>
+      <td style="font-size:11px;color:var(--text2);">${t.train_type||''}</td>
+      <td><span style="color:#92400e;font-size:12px;font-weight:600;">P${t.priority}</span></td>
+      <td style="font-family:Consolas,monospace;color:#92400e;">${t.overlap_min} min</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── AI ADVISOR ────────────────────────────────────────────────────────────────
+async function callAI() {
+  const w = state.selectedWindow;
+  if (!w) { toast('Select a window first', 'error'); return; }
+
+  const btn = document.getElementById('btn-ai');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></div> Consulting DeepSeek R1...';
+
+  // Collect station gaps for selected faults
+  let stationGaps = null;
+  if (state.computeResult?.per_fault_gaps) {
+    stationGaps = [...state.selectedFaultIds].map(fid => {
+      const dayData = state.computeResult.per_fault_gaps[fid];
+      return dayData?.[w.day] || null;
+    }).filter(Boolean);
+  }
+
+  try {
+    const res = await fetch('/api/block-scheduler/ai-advise', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        corridor_id: state.corridorId,
+        corridor_name: state.corridorName,
+        cluster_info: buildClusterInfo(),
+        window_day: w.day,
+        window_start: w.gap_start,
+        window_end: w.gap_end,
+        window_start_min: w.gap_start_min,
+        window_end_min: w.gap_end_min,
+        station_gaps: stationGaps,
+      })
+    });
+    const d = await res.json();
+    state.aiResult = d;
+    renderAICard(d);
+    toast('AI analysis complete', 'success');
+  } catch(e) {
+    toast('AI call failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Request AI Analysis (DeepSeek R1)';
+  }
+}
+
+function renderAICard(d) {
+  const card = document.getElementById('ai-card');
+  card.classList.add('visible');
+
+  const verdict = d.verdict || 'UNKNOWN';
+  const verdictEl = document.getElementById('ai-verdict');
+  const icons = {'FEASIBLE': 'FEASIBLE', 'RISKY': 'RISKY — Exercise Caution', 'NOT_FEASIBLE': 'NOT FEASIBLE', 'UNKNOWN': 'UNKNOWN'};
+  verdictEl.textContent = icons[verdict] || verdict;
+  verdictEl.className = `ai-verdict verdict-${verdict}`;
+  document.getElementById('ai-summary').textContent = d.summary || '';
+
+  const riskTrains = d.high_risk_trains || [];
+  const rtRow = document.getElementById('ai-risk-trains-row');
+  if (riskTrains.length) {
+    rtRow.style.display = 'block';
+    document.getElementById('ai-risk-trains').innerHTML = riskTrains.map(t => `<span class="risk-train-tag">${t}</span>`).join('');
+  } else { rtRow.style.display = 'none'; }
+
+  const suggestions = d.suggestions || [];
+  const sugRow = document.getElementById('ai-suggestions-row');
+  if (suggestions.length) {
+    sugRow.style.display = 'block';
+    document.getElementById('ai-suggestions').innerHTML = suggestions.map(s => `<li>${s}</li>`).join('');
+  } else { sugRow.style.display = 'none'; }
+
+  const splitEl = document.getElementById('ai-split');
+  if (d.split_recommended && d.split_suggestion) {
+    splitEl.style.display = 'block';
+    splitEl.innerHTML = `<strong>Split Recommended:</strong> ${d.split_suggestion}`;
+  } else { splitEl.style.display = 'none'; }
+}
+
+// ── MANAGER DECISION ──────────────────────────────────────────────────────────
+async function submitDecision(decision) {
+  const w = state.selectedWindow;
+  if (!w) { toast('No window selected', 'error'); return; }
+
+  const notes = document.getElementById('manager-notes').value.trim();
+  const clusterInfo = buildClusterInfo();
+  const blockId = `MB-${Date.now()}`;
+
+  const payload = {
+    block_id: blockId,
+    corridor_id: state.corridorId,
+    fault_ids: clusterInfo.faults?.map(f => f.id) || [...state.selectedFaultIds],
+    category: (clusterInfo.categories || clusterInfo.faults?.map(f => f.category) || ['Mixed'])[0] || 'Mixed',
+    block_start: w.gap_start,
+    block_end: w.gap_end,
+    block_dur_min: w.gap_duration_min,
+    day_of_week: w.day,
+    window_type: 'scheduled',
+    ai_recommendation: state.aiResult?.summary || '',
+    ai_feasibility: state.aiResult?.verdict || 'UNKNOWN',
+    manager_decision: decision,
+    manager_notes: notes,
+  };
+
+  try {
+    const res = await fetch('/api/block-scheduler/decide', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await res.json();
+    if (d.success) {
+      toast(`Block ${decision === 'approved' ? 'Approved' : 'Rejected'}: ${w.day} ${w.gap_start}–${w.gap_end}`, decision === 'approved' ? 'success' : 'info');
+      state.isApproved = (decision === 'approved');
+      syncActiveAdvisory(w, null);
+      loadScheduledBlocks();
+      if (decision === 'rejected') {
+        loadNextBest(w);
+      }
+    }
+  } catch(e) { toast('Decision save failed: ' + e.message, 'error'); }
+}
+
+async function loadNextBest(rejectedWindow) {
+  try {
+    const blockDur = rejectedWindow.gap_duration_min;
+    const res = await fetch(`/api/block-scheduler/next-best?corridor_id=${state.corridorId}&block_duration_min=${blockDur}&current_day=${rejectedWindow.day}&current_start=${rejectedWindow.gap_start_min}`);
+    const d = await res.json();
+    if (d.next_best && d.next_best.length) {
+      const nb = d.next_best[0];
+      toast(`Next best window: ${nb.day} ${nb.gap_start}–${nb.gap_end} (${nb.gap_duration_min} min, penalty: ${nb.total_penalty_score})`, 'info', 6000);
+      // Auto-select it
+      setTimeout(() => {
+        selectWindowFromCalendar(nb.day, nb.gap_start_min, nb.gap_end_min, nb.gap_start, nb.gap_end, nb.gap_duration_min, nb.headroom_min);
+      }, 1000);
+    } else {
+      toast('No alternative windows found. Try different faults or reduce block time.', 'info', 5000);
+    }
+  } catch(e) {}
+}
+
+// ── LOAD SCHEDULED BLOCKS ─────────────────────────────────────────────────────
+async function loadScheduledBlocks() {
+  try {
+    const res = await fetch(`/api/block-scheduler/schedule?corridor_id=${state.corridorId}`);
+    const d = await res.json();
+    state.scheduledBlocks = d.blocks || [];
+    renderWeekView();
+    // Re-render calendar if we have compute results
+    if (state.computeResult) {
+      renderCalendar(state.computeResult.generic_week);
+    }
+  } catch(e) {}
+}
+
+function renderWeekView() {
+  const el = document.getElementById('week-view-grid');
+  const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  if (!state.scheduledBlocks.length) {
+    el.innerHTML = `<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No blocks scheduled</div><div class="empty-sub">Approve blocks to see them in the strategic week view.</div></div>`;
+    return;
+  }
+  el.innerHTML = days.map(day => {
+    const blocks = state.scheduledBlocks.filter(b => b.day_of_week === day);
+    const dayBlocks = blocks.map(b => {
+      const cls = b.manager_decision === 'approved' ? 'wv-approved' : b.manager_decision === 'rejected' ? 'wv-rejected' : 'wv-scheduled';
+      const icon = b.manager_decision === 'approved' ? '✅' : b.manager_decision === 'rejected' ? '❌' : '⏳';
+      return `<div class="wv-block ${cls}">
+        <div class="wv-block-time">${b.block_start} – ${b.block_end}</div>
+        <div>${icon} ${b.category}</div>
+        <div>${b.block_dur_min}m</div>
+      </div>`;
+    }).join('');
+    return `<div class="wv-day">
+      <div class="wv-day-header">${day.slice(0,3).toUpperCase()}</div>
+      ${dayBlocks || '<div class="wv-free">Free</div>'}
+    </div>`;
+  }).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const qCorridor = urlParams.get('corridor') || urlParams.get('corridor_id');
+const initSel = document.getElementById('corridor-select');
+if (qCorridor && CORRIDOR_NAMES[qCorridor]) {
+  if (initSel) initSel.value = qCorridor;
+  state.corridorId = qCorridor;
+} else if (initSel && initSel.value) {
+  state.corridorId = initSel.value;
+}
+state.corridorName = CORRIDOR_NAMES[state.corridorId] || state.corridorId;
+loadFaults();
+</script>
+</body>
+</html>

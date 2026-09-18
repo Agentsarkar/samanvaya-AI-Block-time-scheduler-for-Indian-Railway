@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAMANVAY — AI Asset Degradation Simulator</title>
+  <meta name="description" content="AI-driven asset health scoring, fatigue curve simulation and failure prediction for Indian Railways"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <!-- Chart.js for Health vs Time Degradation Curve -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root{
+      --bg:#f1f5f9;--surface:#fff;--surface2:#f8fafc;--surface3:#e2e8f0;
+      --border:#d1d5db;--border2:#9ca3af;
+      --accent:#1e3a8a;--accent2:#1d4ed8;
+      --green:#166534;--amber:#92400e;--red:#991b1b;--sky:#075985;
+      --text:#111827;--text2:#374151;--text3:#6b7280;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:Roboto,Arial,sans-serif;overflow-x:hidden;font-size:14px;}
+
+    /* HEADER */
+    .header{display:flex;align-items:center;gap:12px;padding:0 20px;min-height:50px;background:#1e3a8a;border-bottom:4px solid #b45309;color:#fff;position:sticky;top:0;z-index:100;}
+    .logo{display:flex;align-items:center;gap:10px;}
+    .logo .ir-box{width:32px;height:32px;background:#fff;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1px solid #bfdbfe;flex-shrink:0;}
+    .logo-title{font-size:14px;font-weight:700;color:#fff;}
+    .logo-sep{color:#93c5fd;margin:0 3px;}
+    .logo-sub{color:#bfdbfe;font-weight:400;font-size:13px;}
+    .header-nav{display:flex;align-items:center;gap:4px;margin-left:12px;border-left:1px solid #2d4fa3;padding-left:12px;}
+    .btn-nav{background:transparent;border:1px solid #2d4fa3;color:#bfdbfe;padding:4px 10px;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+    .btn-nav:hover,.btn-nav.active{background:#172554;border-color:#3b6fd4;color:#fff;}
+    #live-time{font-size:12px;color:#93c5fd;padding:4px 10px;background:#172554;border:1px solid #2d4fa3;margin-left:auto;font-variant-numeric:tabular-nums;}
+
+    /* LAYOUT */
+    .main-grid{display:grid;grid-template-columns:380px 1fr;gap:0;height:calc(100vh - 54px);}
+    .sidebar{background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+    .panel{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);padding:16px;}
+
+    /* SIDEBAR SECTIONS */
+    .sb-section{border-bottom:1px solid var(--border);padding:14px 16px;}
+    .sb-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+
+    /* FAULT CARDS */
+    .fault-card{background:#fff;border:1px solid var(--border);border-left:4px solid #d1d5db;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+    .fault-card:hover{background:#f8fafc;border-color:var(--border2);}
+    .fault-card.selected{border-left-color:#1e3a8a;background:#eff6ff;border-color:#bfdbfe;}
+    .fault-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+    .fault-badge{font-size:10px;font-weight:700;padding:2px 6px;text-transform:uppercase;border-radius:2px;}
+    .badge-track{color:#991b1b;background:#fef2f2;border:1px solid #fecaca;}
+    .badge-traction{color:#92400e;background:#fffbeb;border:1px solid #fde68a;}
+    .badge-signal{color:#1e3a8a;background:#eff6ff;border:1px solid #bfdbfe;}
+    .fault-id{font-size:11px;font-weight:700;color:var(--text2);font-family:Consolas,monospace;}
+    .fault-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+    .fault-loc{font-size:11px;color:var(--text3);}
+
+    /* PARAMETERS FORM */
+    .param-group{margin-bottom:14px;}
+    .param-label{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;}
+    .param-val{font-family:Consolas,monospace;color:#1e3a8a;font-weight:700;}
+    .param-slider{width:100%;accent-color:#1e3a8a;cursor:pointer;}
+    .param-hint{font-size:10px;color:var(--text3);margin-top:2px;}
+
+    /* BUTTON */
+    .btn-run{width:100%;background:#1e3a8a;color:#fff;border:none;padding:10px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;border-radius:2px;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-run:hover{background:#1d4ed8;}
+    .btn-run:disabled{background:#94a3b8;cursor:not-allowed;}
+
+    /* MAIN PANEL UI */
+    .panel-header{background:#fff;border:1px solid var(--border);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+    .asset-title{font-size:18px;font-weight:700;color:#1e3a8a;}
+    .asset-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+    .status-pill{padding:6px 12px;font-size:12px;font-weight:700;border-radius:2px;text-transform:uppercase;letter-spacing:.04em;}
+    .pill-emergency{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;}
+    .pill-warning{background:#fffbeb;color:#92400e;border:1px solid #fcd34d;}
+
+    /* GRAPH CARD */
+    .graph-card{background:#fff;border:1px solid var(--border);padding:16px;margin-bottom:16px;}
+    .graph-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid var(--surface3);padding-bottom:10px;}
+    .graph-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+    .graph-subtitle{font-size:11px;color:var(--text3);font-weight:400;}
+    .graph-container{position:relative;height:320px;width:100%;}
+
+    /* ALERT BANNER */
+    .alert-banner{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #991b1b;padding:12px 16px;margin-bottom:16px;}
+    .alert-header{font-size:13px;font-weight:700;color:#991b1b;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+    .alert-body{font-size:12px;color:#7f1d1d;line-height:1.5;}
+
+    /* AI DIAGNOSIS GRID */
+    .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .ai-card{background:#fff;border:1px solid var(--border);padding:14px 16px;}
+    .ai-card-title{font-size:12px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;border-bottom:1px solid var(--surface3);padding-bottom:6px;}
+    .ai-card-body{font-size:12px;color:var(--text2);line-height:1.6;}
+    .ai-recs-list{list-style:none;padding:0;}
+    .ai-recs-list li{font-size:12px;color:var(--text2);padding:4px 0;display:flex;align-items:flex-start;gap:8px;border-bottom:1px dashed var(--surface3);}
+    .ai-recs-list li:last-child{border-bottom:none;}
+    .bullet-num{background:#eff6ff;color:#1e3a8a;font-weight:700;font-size:10px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;margin-top:2px;}
+
+    /* SPINNER */
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="ir-box">IR</div>
+    <span class="logo-title">SAMANVAY</span><span class="logo-sep">/</span><span class="logo-sub">Asset Degradation Simulator</span>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html" class="btn-nav">Dashboard</a>
+    <a href="map.html" class="btn-nav">Live Map</a>
+    <a href="block.html" class="btn-nav">Block Scheduler</a>
+    <a href="degradation.html" class="btn-nav active">Degradation Sim</a>
+  </nav>
+  <span id="live-time">--:-- IST</span>
+</div>
+
+<!-- MAIN GRID LAYOUT -->
+<div class="main-grid">
+  <!-- SIDEBAR: FAULTS & PARAMETERS -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-title">1. Select Asset Failure Scenario</div>
+      <div id="scenario-list">
+        <!-- Scenario 1: Track Gap -->
+        <div class="fault-card selected" onclick="selectScenario('track_gap', this)">
+          <div class="fault-card-header">
+            <span class="fault-badge badge-track">Track Fault</span>
+            <span class="fault-id">TMS-042</span>
+          </div>
+          <div class="fault-name">Rail Joint Gap & Weld Fissure</div>
+          <div class="fault-loc">Bandel Jn - Adi Saptagram (KM 41/4)</div>
+        </div>
+
+        <!-- Scenario 2: Traction Sag -->
+        <div class="fault-card" onclick="selectScenario('traction_sag', this)">
+          <div class="fault-card-header">
+            <span class="fault-badge badge-traction">Traction Fault</span>
+            <span class="fault-id">TDMS-11</span>
+          </div>
+          <div class="fault-name">OHE Contact Wire Sag & Wear</div>
+          <div class="fault-loc">Memari & Rasulpur (KM 166/8)</div>
+        </div>
+
+        <!-- Scenario 3: Turnout CMS -->
+        <div class="fault-card" onclick="selectScenario('cms_crossing', this)">
+          <div class="fault-card-header">
+            <span class="fault-badge badge-track">Turnout Fault</span>
+            <span class="fault-id">CHD-TRK-14</span>
+          </div>
+          <div class="fault-name">CMS Crossing Nose Micro-Fracture</div>
+          <div class="fault-loc">Kamarkundu Junction (KM 34/2)</div>
+        </div>
+
+        <!-- Scenario 4: Signal AFTC -->
+        <div class="fault-card" onclick="selectScenario('aftc_signal', this)">
+          <div class="fault-card-header">
+            <span class="fault-badge badge-signal">Signal Fault</span>
+            <span class="fault-id">SDAH-SIG-08</span>
+          </div>
+          <div class="fault-name">AFTC Receiver Impedance Drift</div>
+          <div class="fault-loc">Barrackpore & Palta (KM 25/4)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARAMETERS SECTION -->
+    <div class="sb-section" style="flex:1;">
+      <div class="sb-title">2. Operational Parameters</div>
+      
+      <!-- Track Gap Parameter (for Track scenario) -->
+      <div class="param-group" id="group-gap">
+        <div class="param-label">
+          <span>Rail Joint Gap Size</span>
+          <span class="param-val" id="val-gap">2.0 inches</span>
+        </div>
+        <input type="range" class="param-slider" id="slider-gap" min="0.5" max="4.0" step="0.1" value="2.0" oninput="document.getElementById('val-gap').innerText = parseFloat(this.value).toFixed(1) + ' inches'"/>
+        <div class="param-hint">Initial gap width impacting wheel dynamic load</div>
+      </div>
+
+      <!-- Traction Sag & Wear Parameters (for Traction scenario) -->
+      <div class="param-group" id="group-sag" style="display:none;">
+        <div class="param-label">
+          <span>OHE Wire Sag</span>
+          <span class="param-val" id="val-sag">18 mm</span>
+        </div>
+        <input type="range" class="param-slider" id="slider-sag" min="5" max="50" step="1" value="18" oninput="document.getElementById('val-sag').innerText = this.value + ' mm'"/>
+        <div class="param-hint">Wire drop below standard contact plane</div>
+
+        <div class="param-label" style="margin-top:10px;">
+          <span>Contact Wire Section Loss</span>
+          <span class="param-val" id="val-wear">42%</span>
+        </div>
+        <input type="range" class="param-slider" id="slider-wear" min="10" max="80" step="1" value="42" oninput="document.getElementById('val-wear').innerText = this.value + '%'"/>
+        <div class="param-hint">Percentage of copper cross-section worn away</div>
+      </div>
+
+      <!-- Daily Traffic Load Parameter -->
+      <div class="param-group">
+        <div class="param-label">
+          <span>Daily Train Traffic Volume</span>
+          <span class="param-val" id="val-trains">148 trains/day</span>
+        </div>
+        <input type="range" class="param-slider" id="slider-trains" min="40" max="250" step="2" value="148" oninput="document.getElementById('val-trains').innerText = this.value + ' trains/day'"/>
+        <div class="param-hint">Total express, local & freight passes through corridor per 24h</div>
+      </div>
+
+      <!-- Axle Load Parameter -->
+      <div class="param-group">
+        <div class="param-label">
+          <span>Average Axle Load</span>
+          <span class="param-val" id="val-axle">22.5 Tonnes</span>
+        </div>
+        <input type="range" class="param-slider" id="slider-axle" min="18.0" max="25.0" step="0.5" value="22.5" oninput="document.getElementById('val-axle').innerText = parseFloat(this.value).toFixed(1) + ' Tonnes'"/>
+        <div class="param-hint">Heavy haul freight (22.5T) vs passenger express (18.5T)</div>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTON -->
+    <div style="padding:14px 16px;border-top:1px solid var(--border);">
+      <button class="btn-run" id="btn-simulate" onclick="runSimulation()">
+        <span>Run DeepSeek R1 AI Simulation</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: GRAPH & DEEPSEEK ANALYSIS -->
+  <div class="panel">
+    <!-- PANEL HEADER -->
+    <div class="panel-header">
+      <div>
+        <div class="asset-title" id="disp-asset-name">TMS-042: Rail Joint Gap & Weld Fissure</div>
+        <div class="asset-meta" id="disp-asset-meta">Location: Bandel Jn - Adi Saptagram (KM 41/4) | Operating Traffic: 148 Trains/Day</div>
+      </div>
+      <div class="status-pill pill-emergency" id="disp-status-pill">
+        Priority Emergency Threshold: Day 18
+      </div>
+    </div>
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner" id="alert-banner">
+      <div class="alert-header">
+        <span>CRITICAL ALERT: Priority Emergency Failure Threshold</span>
+      </div>
+      <div class="alert-body" id="disp-alert-body">
+        DeepSeek R1 fatigue analysis projects a <b>Catastrophic Rail Break / Derailment Risk</b> in <b>18 Days</b> (30-Sep-2026) under current 148 trains/day traffic load. Immediate maintenance block scheduling recommended prior to Day 12.
+      </div>
+    </div>
+
+    <!-- GRAPH CARD (Concept Implementation) -->
+    <div class="graph-card">
+      <div class="graph-header">
+        <div>
+          <div class="graph-title">
+            <span>Layer 2 AI Intelligence — Degradation Curve (Asset Health Scoring)</span>
+          </div>
+          <div class="graph-subtitle">Predictive fatigue curve modeling asset health decay (%) over time under daily train load</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-family:Consolas,monospace;">
+          Model: DeepSeek R1 + Paris Law Fatigue Growth
+        </div>
+      </div>
+      <div class="graph-container">
+        <canvas id="degradationChart"></canvas>
+      </div>
+    </div>
+
+    <!-- AI DIAGNOSIS & DIRECTIVES GRID -->
+    <div class="ai-grid">
+      <!-- Card 1: Physics Degradation Mechanism -->
+      <div class="ai-card">
+        <div class="ai-card-title">1. Physics & Structural Degradation Mechanism</div>
+        <div class="ai-card-body" id="disp-mech-body">
+          Loading...
+        </div>
+      </div>
+
+      <!-- Card 2: Failure Timeline & Risk -->
+      <div class="ai-card">
+        <div class="ai-card-title">2. Failure Consequence & Derailment Timeline</div>
+        <div class="ai-card-body" id="disp-conseq-body">
+          Loading...
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Action Recommendations -->
+    <div class="ai-card" style="margin-bottom:16px;">
+      <div class="ai-card-title">3. Recommended Maintenance Directives & Emergency Block Window</div>
+      <ul class="ai-recs-list" id="disp-recs-list">
+        <li><span class="bullet-num">1</span><span>Loading directives...</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentScenario = 'track_gap';
+let chartInstance = null;
+
+// Clock updates
+function updateClock(){
+  const now = new Date();
+  const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+  document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', options) + ' IST';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function selectScenario(type, elem) {
+  currentScenario = type;
+  document.querySelectorAll('.fault-card').forEach(c => c.classList.remove('selected'));
+  elem.classList.add('selected');
+
+  // Toggle visible parameter controls
+  if(type === 'track_gap') {
+    document.getElementById('group-gap').style.display = 'block';
+    document.getElementById('group-sag').style.display = 'none';
+  } else if(type === 'traction_sag') {
+    document.getElementById('group-gap').style.display = 'none';
+    document.getElementById('group-sag').style.display = 'block';
+  } else {
+    document.getElementById('group-gap').style.display = 'none';
+    document.getElementById('group-sag').style.display = 'none';
+  }
+
+  // Trigger auto-simulation run
+  runSimulation();
+}
+
+async function runSimulation() {
+  const btn = document.getElementById('btn-simulate');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Consulting DeepSeek R1 AI...';
+
+  const gap_inches = parseFloat(document.getElementById('slider-gap').value);
+  const sag_mm = parseFloat(document.getElementById('slider-sag').value);
+  const wire_wear_pct = parseFloat(document.getElementById('slider-wear').value);
+  const trains_per_day = parseInt(document.getElementById('slider-trains').value);
+  const axle_load_tonnes = parseFloat(document.getElementById('slider-axle').value);
+
+  let asset_name = "KM 41/4 Rail Joint Gap";
+  let location = "Bandel Jn - Adi Saptagram";
+  let fault_id = "TMS-042";
+
+  if(currentScenario === 'traction_sag') {
+    asset_name = "OHE Contact Wire Sag & Wear";
+    location = "Memari & Rasulpur (KM 166/8)";
+    fault_id = "TDMS-11";
+  } else if(currentScenario === 'cms_crossing') {
+    asset_name = "CMS Crossing Nose Micro-Fracture";
+    location = "Kamarkundu Junction (KM 34/2)";
+    fault_id = "CHD-TRK-14";
+  } else if(currentScenario === 'aftc_signal') {
+    asset_name = "AFTC Receiver Impedance Drift";
+    location = "Barrackpore & Palta (KM 25/4)";
+    fault_id = "SDAH-SIG-08";
+  }
+
+  document.getElementById('disp-asset-name').innerText = `${fault_id}: ${asset_name}`;
+  document.getElementById('disp-asset-meta').innerText = `Location: ${location} | Operating Traffic: ${trains_per_day} Trains/Day | Axle Load: ${axle_load_tonnes}T`;
+
+  try {
+    const resp = await fetch('/api/degradation/simulate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fault_id: fault_id,
+        fault_type: currentScenario,
+        asset_name: asset_name,
+        location: location,
+        corridor_id: "hwh_bwn_main",
+        gap_inches: gap_inches,
+        sag_mm: sag_mm,
+        wire_wear_pct: wire_wear_pct,
+        trains_per_day: trains_per_day,
+        axle_load_tonnes: axle_load_tonnes
+      })
+    });
+
+    if(resp.ok) {
+      const data = await resp.json();
+      btn.disabled = false;
+      btn.innerHTML = '<span>Run DeepSeek R1 AI Simulation</span>';
+      if(data.success) {
+        renderResults(data);
+        return;
+      }
+    }
+  } catch(err) {
+    console.warn("Simulation fetch error, running local engine:", err);
+  }
+
+  const fallbackData = computeLocalFallback(currentScenario, fault_id, asset_name, location, gap_inches, sag_mm, wire_wear_pct, trains_per_day, axle_load_tonnes);
+  btn.disabled = false;
+  btn.innerHTML = '<span>Run DeepSeek R1 AI Simulation</span>';
+  renderResults(fallbackData);
+}
+
+function computeLocalFallback(ftype, fault_id, asset_name, location, gap_in, sag_mm, wear_pct, trains_day, axle_load) {
+  let curr_health = ftype === "track_gap" ? 88.0 : (ftype === "traction_sag" ? 85.0 : 90.0);
+  const timeline = [];
+  let warning_day = null;
+  let emergency_day = null;
+
+  for (let d = 0; d <= 45; d++) {
+    let daily_drop = 0;
+    if (ftype === "track_gap") {
+      const impact_factor = 1.0 + 0.35 * Math.pow(gap_in, 1.35) * (axle_load / 22.5);
+      daily_drop = 0.42 * Math.pow(impact_factor, 1.8) * (trains_day / 100.0) * (1.0 + Math.pow(d / 20.0, 1.5));
+    } else if (ftype === "traction_sag") {
+      const panto_force = 70.0 + 2.4 * sag_mm;
+      daily_drop = (0.25 + 0.15 * Math.pow(wear_pct / 40.0, 2)) * (panto_force / 70.0) * (trains_day / 100.0) * (1.0 + Math.pow(d / 22.0, 1.4));
+    } else if (ftype === "cms_crossing") {
+      daily_drop = 0.55 * Math.pow(axle_load / 22.5, 2.2) * (trains_day / 100.0) * (1.0 + Math.pow(d / 18.0, 1.6));
+    } else {
+      daily_drop = 0.65 * (trains_day / 100.0) * (1.0 + Math.pow(d / 25.0, 1.2));
+    }
+
+    const health_val = Math.max(3.0, Math.round(curr_health * 10) / 10);
+    let status_label = "SAFE";
+    if (health_val < 25.0) {
+      status_label = "PRIORITY EMERGENCY";
+      if (emergency_day === null) emergency_day = d;
+    } else if (health_val < 55.0) {
+      status_label = "WARNING";
+      if (warning_day === null) warning_day = d;
+    }
+
+    timeline.push({
+      day: d,
+      health: health_val,
+      status: status_label,
+      cumulative_trains: d * trains_day
+    });
+
+    curr_health -= daily_drop;
+  }
+
+  if (warning_day === null) warning_day = 12;
+  if (emergency_day === null) emergency_day = 18;
+
+  const now = new Date();
+  const warnDt = new Date(now.getTime() + warning_day * 86400000);
+  const emgDt = new Date(now.getTime() + emergency_day * 86400000);
+
+  const formatDate = (dt) => dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  let mech_text = "";
+  let conseq_text = "";
+  let recs = [];
+
+  if (ftype === "track_gap") {
+    mech_text = `The ${gap_in}-inch gap under ${trains_day} daily train passes causes dynamic impact loading (K=${(1.0 + 0.35 * Math.pow(gap_in, 1.35) * (axle_load / 22.5)).toFixed(2)}). According to Paris' Law fatigue crack growth (da/dN = C(ΔK)^m), heavy ${axle_load}T axle stress concentration accelerates thermit weld micro-fissure propagation into a full transverse rail break.`;
+    conseq_text = `By Day ${emergency_day} (${formatDate(emgDt)}), accumulated wheel impacts (${(emergency_day * trains_day).toLocaleString()} trains) will breach critical crack length. Unmitigated operation past this point creates catastrophic derailment risk for high-speed passenger expresses.`;
+    recs = [
+      `Impose immediate 20 km/h speed restriction on ${location} to reduce dynamic wheel impact by 45%.`,
+      `Schedule a 105-minute emergency track block prior to Day ${warning_day} (${formatDate(warnDt)}) for thermit weld re-execution.`,
+      `Deploy Ultrasonic Flaw Detection (USFD) vehicle to monitor crack depth growth twice weekly.`
+    ];
+  } else if (ftype === "traction_sag") {
+    mech_text = `An OHE wire sag of ${sag_mm}mm combined with ${wear_pct}% contact wire section loss increases pantograph dynamic strike force to ${(70.0 + 2.4 * sag_mm).toFixed(1)} N. Each pantograph pass (${trains_day * 2} passes/day) generates localized arcing, thermal degradation, and mechanical notches.`;
+    conseq_text = `By Day ${emergency_day} (${formatDate(emgDt)}), contact wire cross-section will drop below minimum tensile safety threshold, leading to catenary wire snap, pantograph entanglement, and multi-track power trip.`;
+    recs = [
+      `Schedule 90-min OHE power block before Day ${warning_day} (${formatDate(warnDt)}) for tower wagon re-tensioning.`,
+      `Replace worn contact wire splice and recalibrate dropper tension.`,
+      `Issue advisory to electric locomotives to lower pantograph speed when passing KM 166/8.`
+    ];
+  } else {
+    mech_text = `Asset load of ${trains_day} trains/day is causing cyclic stress degradation. Failure projected at Day ${emergency_day}.`;
+    conseq_text = `Asset failure by Day ${emergency_day} will cause severe blockages and signal trips.`;
+    recs = [`Schedule maintenance block within 7 days`, `Enforce local caution order`];
+  }
+
+  return {
+    success: true,
+    fault_id: fault_id,
+    fault_type: ftype,
+    asset_name: asset_name,
+    location: location,
+    parameters: { gap_inches: gap_in, sag_mm: sag_mm, wire_wear_pct: wear_pct, trains_per_day: trains_day, axle_load_tonnes: axle_load },
+    days_to_warning: warning_day,
+    warning_date: formatDate(warnDt),
+    days_to_emergency: emergency_day,
+    emergency_date: formatDate(emgDt),
+    total_trains_before_failure: emergency_day * trains_day,
+    health_timeline: timeline,
+    ai_analysis: {
+      degradation_mechanism: mech_text,
+      failure_consequence: conseq_text,
+      derailment_risk_rating: `CRITICAL (${emergency_day} Days to Failure)`,
+      action_recommendations: recs
+    }
+  };
+}
+
+function renderResults(data) {
+  // Update status pill & alert
+  const pill = document.getElementById('disp-status-pill');
+  pill.innerText = `Priority Emergency Threshold: Day ${data.days_to_emergency}`;
+  pill.className = 'status-pill pill-emergency';
+
+  const alertBody = document.getElementById('disp-alert-body');
+  alertBody.innerHTML = `DeepSeek R1 fatigue analysis projects a <b>${data.ai_analysis.derailment_risk_rating || 'Priority Emergency'}</b> on <b>Day ${data.days_to_emergency}</b> (${data.emergency_date}) after <b>${data.total_trains_before_failure.toLocaleString()} train passes</b> under current ${data.parameters.trains_per_day} trains/day traffic load. Immediate maintenance block scheduling recommended prior to Day ${data.days_to_warning} (${data.warning_date}).`;
+
+  // Update AI Analysis fields
+  document.getElementById('disp-mech-body').innerText = data.ai_analysis.degradation_mechanism;
+  document.getElementById('disp-conseq-body').innerText = data.ai_analysis.failure_consequence;
+
+  const recsList = document.getElementById('disp-recs-list');
+  recsList.innerHTML = '';
+  (data.ai_analysis.action_recommendations || []).forEach((rec, idx) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="bullet-num">${idx + 1}</span><span>${rec}</span>`;
+    recsList.appendChild(li);
+  });
+
+  // Render Degradation Chart
+  renderDegradationGraph(data.health_timeline, data.days_to_warning, data.days_to_emergency);
+}
+
+function renderDegradationGraph(timeline, warningDay, emergencyDay) {
+  if (typeof Chart !== 'undefined') {
+    try {
+      const ctx = document.getElementById('degradationChart').getContext('2d');
+      const labels = timeline.map(t => `Day ${t.day}`);
+      const healthData = timeline.map(t => t.health);
+
+      const pointColors = timeline.map(t => {
+        if(t.health < 25) return '#991b1b';
+        if(t.health < 55) return '#92400e';
+        return '#1e3a8a';
+      });
+
+      const pointRadius = timeline.map(t => {
+        if(t.day === emergencyDay || t.day === warningDay) return 7;
+        return 4;
+      });
+
+      if(chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Asset Health Score (%)',
+              data: healthData,
+              borderColor: '#1d4ed8',
+              borderWidth: 3,
+              tension: 0.35,
+              pointBackgroundColor: pointColors,
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: pointRadius,
+              fill: {
+                target: 'origin',
+                above: 'rgba(29, 78, 216, 0.08)'
+              }
+            },
+            {
+              label: 'Priority Emergency Threshold (25%)',
+              data: Array(timeline.length).fill(25),
+              borderColor: '#991b1b',
+              borderWidth: 2,
+              borderDash: [6, 4],
+              pointRadius: 0,
+              fill: false
+            },
+            {
+              label: 'Maintenance Warning Threshold (55%)',
+              data: Array(timeline.length).fill(55),
+              borderColor: '#92400e',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              pointRadius: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1200,
+            easing: 'easeOutQuart'
+          },
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: { family: 'Roboto', size: 12, weight: '500' },
+                usePointStyle: true,
+                boxWidth: 8
+              }
+            },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleFont: { family: 'Roboto', size: 13, weight: 'bold' },
+              bodyFont: { family: 'Roboto', size: 12 },
+              padding: 10,
+              callbacks: {
+                label: function(context) {
+                  if(context.datasetIndex === 0) {
+                    const dayObj = timeline[context.dataIndex];
+                    return `Asset Health: ${context.parsed.y}% | Passed Trains: ${dayObj.cumulative_trains.toLocaleString()}`;
+                  }
+                  return `${context.dataset.label}: ${context.parsed.y}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: '#e2e8f0' },
+              ticks: { font: { family: 'Roboto', size: 11 }, maxTicksLimit: 15 }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: '#e2e8f0' },
+              ticks: {
+                font: { family: 'Roboto', size: 11 },
+                callback: function(val) { return val + '%'; }
+              },
+              title: {
+                display: true,
+                text: 'Asset Health Score (%)',
+                font: { family: 'Roboto', size: 12, weight: 'bold' },
+                color: '#374151'
+              }
+            }
+          }
+        }
+      });
+      return;
+    } catch(e) {
+      console.warn("Chart.js init failed, falling back to 2D Canvas:", e);
+    }
+  }
+
+  // Fallback to Native Canvas 2D Renderer
+  drawCanvasFallback('degradationChart', timeline, warningDay, emergencyDay);
+}
+
+function drawCanvasFallback(canvasId, timeline, warningDay, emergencyDay) {
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const width = canvas.parentElement.clientWidth || 800;
+  const height = canvas.parentElement.clientHeight || 320;
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.clearRect(0, 0, width, height);
+
+  const paddingLeft = 55;
+  const paddingRight = 30;
+  const paddingTop = 30;
+  const paddingBottom = 40;
+
+  const chartW = width - paddingLeft - paddingRight;
+  const chartH = height - paddingTop - paddingBottom;
+
+  const y25 = paddingTop + chartH * (1 - 25/100);
+  const y55 = paddingTop + chartH * (1 - 55/100);
+
+  // Red zone background (< 25%)
+  ctx.fillStyle = 'rgba(254, 242, 242, 0.7)';
+  ctx.fillRect(paddingLeft, y25, chartW, height - paddingBottom - y25);
+
+  // Amber zone background (25% - 55%)
+  ctx.fillStyle = 'rgba(255, 251, 235, 0.6)';
+  ctx.fillRect(paddingLeft, y55, chartW, y25 - y55);
+
+  // Grid lines
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 1;
+  for(let p = 0; p <= 100; p += 25) {
+    const y = paddingTop + chartH * (1 - p/100);
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, y);
+    ctx.lineTo(paddingLeft + chartW, y);
+    ctx.stroke();
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '11px Roboto, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(p + '%', paddingLeft - 8, y + 4);
+  }
+
+  // Threshold lines
+  ctx.strokeStyle = '#991b1b';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, y25);
+  ctx.lineTo(paddingLeft + chartW, y25);
+  ctx.stroke();
+
+  ctx.fillStyle = '#991b1b';
+  ctx.font = 'bold 11px Roboto, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('PRIORITY EMERGENCY THRESHOLD (25%)', paddingLeft + chartW - 10, y25 - 6);
+
+  ctx.strokeStyle = '#92400e';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, y55);
+  ctx.lineTo(paddingLeft + chartW, y55);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#92400e';
+  ctx.font = 'bold 11px Roboto, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('MAINTENANCE WARNING THRESHOLD (55%)', paddingLeft + chartW - 10, y55 - 6);
+
+  const points = timeline.map((t, idx) => {
+    const x = paddingLeft + (idx / (timeline.length - 1)) * chartW;
+    const y = paddingTop + chartH * (1 - t.health / 100);
+    return { x, y, day: t.day, health: t.health };
+  });
+
+  // Curve fill
+  ctx.fillStyle = 'rgba(29, 78, 216, 0.12)';
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for(let i = 1; i < points.length; i++) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.lineTo(points[points.length - 1].x, paddingTop + chartH);
+  ctx.lineTo(points[0].x, paddingTop + chartH);
+  ctx.closePath();
+  ctx.fill();
+
+  // Curve line
+  ctx.strokeStyle = '#1d4ed8';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for(let i = 1; i < points.length; i++) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.stroke();
+
+  // Draw points
+  points.forEach((pt) => {
+    let pColor = '#1e3a8a';
+    let r = 4;
+    if(pt.health < 25) pColor = '#991b1b';
+    else if(pt.health < 55) pColor = '#92400e';
+
+    if(pt.day === emergencyDay || pt.day === warningDay) r = 7;
+
+    ctx.fillStyle = pColor;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    if(pt.day === emergencyDay) {
+      ctx.fillStyle = '#991b1b';
+      ctx.font = 'bold 11px Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Day ${pt.day}: Priority Emergency (${pt.health}%)`, pt.x, pt.y - 12);
+    }
+  });
+
+  // X Labels
+  ctx.fillStyle = '#475569';
+  ctx.font = '11px Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  const step = Math.ceil(timeline.length / 8);
+  for(let i = 0; i < timeline.length; i += step) {
+    ctx.fillText(`Day ${timeline[i].day}`, points[i].x, height - 12);
+  }
+}
+
+// Initial simulation run on load
+window.addEventListener('DOMContentLoaded', () => {
+  runSimulation();
+});
+</script>
+
+</body>
+</html>

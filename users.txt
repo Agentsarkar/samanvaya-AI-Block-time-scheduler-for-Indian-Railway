@@ -1,0 +1,9 @@
+# SAMANVAY Railway DSS - User Credentials Database
+# Format: employee_id:password:full_name:role_id:role_title:division:section
+# role_id can be 'maintenance-planner' or 'control-room'
+
+7842901:railway@123:Rajesh Sharma:maintenance-planner:Divisional Engineer (Eastern Railway):Howrah:HWH-BWN Main Line
+7842902:railway@123:Priya Mukherjee:control-room:Control Room Dispatcher (Live DSS):Howrah:HWH-BWN Main Line
+7842903:railway@123:Amitav Sen:maintenance-planner:Senior Divisional Engineer (Coordination):Sealdah:SDAH-RHA Line
+admin:admin123:Er. V. K. Verma:maintenance-planner:Divisional Engineer (Eastern Railway):Howrah:HWH-BWN Main Line
+demo:demo123:Sunil K. Banerjee:maintenance-planner:Divisional Engineer (Eastern Railway):Howrah:HWH-BWN Main Line

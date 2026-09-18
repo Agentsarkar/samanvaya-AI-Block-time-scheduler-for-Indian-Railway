@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAMANVAY | 2D Live GIS & Corridor Fault Map</title>
+  <meta name="description" content="2D Live Railway Map with Station Locations, Faulty Lines, Primary Corridors, and Train Simulation for SAMANVAY DSS">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="./static/css/fonts.css" rel="stylesheet">
+  <script src="./static/js/tailwind.js"></script>
+
+  <!-- Leaflet CSS & JS (Local with CDN fallback) -->
+  <link rel="stylesheet" href="./static/leaflet/leaflet.css" />
+  <script src="./static/leaflet/leaflet.js"></script>
+  <!-- Precision Track-Following Train Path Calculator Algorithm -->
+  <script src="./static/train_path_calculator.js"></script>
+  <!-- Real-Time Train Simulation Engine -->
+  <script src="./static/train_sim.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Roboto', 'Inter', 'Arial', 'sans-serif'] },
+          colors: {
+            rail: { navy: '#1e3a8a', ink: '#172554', line: '#cbd5e1' },
+            dept: { track: '#92400e', ohe: '#1d4ed8', signal: '#a16207', works: '#475569' }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body { font-family: Roboto, Inter, Arial, sans-serif; }
+    #map { height: calc(100vh - 105px); width: 100%; background: #0b132b; }
+
+    /* Pulsing danger glow for faulty lines */
+    @keyframes pulse-fault {
+      0% { stroke-opacity: 1; stroke-width: 6; }
+      50% { stroke-opacity: 0.35; stroke-width: 10; }
+      100% { stroke-opacity: 1; stroke-width: 6; }
+    }
+    .fault-polyline {
+      animation: pulse-fault 1.6s infinite ease-in-out;
+    }
+
+    /* High-Visibility Fault Circles and Radiating Sonar Waves */
+    @keyframes sonar-ripple {
+      0% { transform: scale(0.75); opacity: 0.95; }
+      50% { transform: scale(1.6); opacity: 0.45; }
+      100% { transform: scale(2.3); opacity: 0; }
+    }
+    .sonar-wave {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      animation: sonar-ripple 1.8s infinite ease-out;
+      pointer-events: none;
+    }
+    @keyframes circle-glow {
+      0% { fill-opacity: 0.22; stroke-width: 2.5; }
+      50% { fill-opacity: 0.45; stroke-width: 4.5; }
+      100% { fill-opacity: 0.22; stroke-width: 2.5; }
+    }
+    .fault-geo-circle {
+      animation: circle-glow 2s infinite ease-in-out;
+    }
+
+    /* Train Marker & Full Name Badge styling */
+    .train-svg-icon {
+      overflow: visible !important;
+      border: none !important;
+      background: transparent !important;
+    }
+    .train-marker-wrapper:hover {
+      transform: scale(1.15);
+      z-index: 9999 !important;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Custom Leaflet Tooltip & Popup styling */
+    .leaflet-popup-content-wrapper {
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+    }
+    .leaflet-popup-tip { background: #0f172a; }
+    .leaflet-container { font-family: inherit; }
+
+    /* Custom train marker styles */
+    .train-pin {
+      transition: transform 0.2s linear;
+    }
+
+    /* SVG Locomotive train marker */
+    .train-svg-icon {
+      background: transparent !important;
+      border: none !important;
+    }
+
+    /* Dark train popup */
+    .train-popup-dark .leaflet-popup-content-wrapper {
+      background: #0f172a;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 0;
+      overflow: hidden;
+    }
+    .train-popup-dark .leaflet-popup-content {
+      margin: 0;
+      min-width: 240px;
+    }
+    .train-popup-dark .leaflet-popup-tip {
+      background: #0f172a;
+    }
+
+    /* Sim status badge */
+    #real-train-status {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
+
+  <!-- Application Header -->
+  <header class="border-b border-blue-900 bg-blue-900 shadow-md shrink-0 z-30">
+    <div class="flex items-center justify-between px-4 py-2">
+      <!-- Logo and App Title -->
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded bg-amber-400 font-bold text-blue-950 text-base shadow">
+          CRIS
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold tracking-tight text-white">SAMANVAY</h1>
+            <span class="rounded bg-blue-800 px-2 py-0.5 text-[11px] font-semibold text-amber-300 border border-amber-400/40">
+              Live 2D GIS Network
+            </span>
+          </div>
+          <p class="text-[11px] text-blue-200">Howrah – Barddhaman & Sealdah Operational Corridors (Eastern Railway)</p>
+        </div>
+
+        <!-- Navigation Tabs between Strategic Planner and Live Map -->
+        <nav class="hidden sm:flex items-center gap-1 ml-4 border-l border-blue-700 pl-4 text-xs font-semibold">
+          <a href="/index.html" class="flex items-center gap-1.5 rounded px-3 py-1.5 text-blue-200 hover:bg-blue-800 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            Strategic Planner
+          </a>
+          <a href="/map.html" class="flex items-center gap-1.5 rounded bg-blue-950 border border-amber-400 px-3 py-1.5 text-white shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            2D GIS Map
+          </a>
+          <a href="/block.html" class="flex items-center gap-1.5 rounded px-3 py-1.5 text-blue-200 hover:bg-blue-800 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            <span>Block Scheduler</span>
+          </a>
+          <a href="/degradation.html" class="flex items-center gap-1.5 rounded px-3 py-1.5 text-blue-200 hover:bg-blue-800 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span>Degradation Sim</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Authenticated User & Logout -->
+      <div class="flex shrink-0 items-center gap-3 text-xs">
+        <div class="text-right">
+          <p id="user-display-name" class="font-bold text-white text-sm">Rajesh Sharma</p>
+          <p id="user-display-role" class="text-blue-200 text-xs font-medium">Divisional Engineer (Eastern Railway)</p>
+        </div>
+        <button id="logout-btn" type="button" class="border border-blue-300 bg-blue-800 px-3 py-2 font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white flex items-center gap-1.5 transition-colors cursor-pointer" title="Sign out of SAMANVAY">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile tab switch -->
+    <div class="flex sm:hidden border-t border-blue-800 bg-blue-950 px-3 py-1.5 text-xs justify-around">
+      <a href="/index.html" class="text-blue-200 hover:text-white">Strategic Planner</a>
+      <a href="/map.html" class="font-bold text-amber-400">2D GIS Map (Active)</a>
+    </div>
+  </header>
+
+  <!-- Context & Control Toolbar -->
+  <div class="border-b border-slate-700 bg-slate-800 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-3 shrink-0">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300">
+      <span><b>Working Divisions:</b> <span class="text-white font-semibold">Howrah & Sealdah (ER)</span></span>
+      <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> <b class="text-emerald-300">2 Primary Corridors Active</b></span>
+      <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span> <b class="text-red-400" id="fault-count-badge">8 Faults Detected</b></span>
+    </div>
+
+    <!-- Controls, Toggle Buttons, and Filters -->
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Search Station Box -->
+      <div class="relative">
+        <input id="station-search" type="text" placeholder="Search station (e.g. Sealdah, Bandel, BWN)..." class="rounded bg-slate-900 border border-slate-600 px-2.5 py-1 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 w-48 sm:w-56">
+        <div id="search-results" class="absolute left-0 top-8 z-50 hidden max-h-56 w-56 overflow-y-auto rounded border border-slate-700 bg-slate-900 shadow-2xl text-xs"></div>
+      </div>
+
+      <!-- Station View Mode Segmented Toggle Switch -->
+      <div class="inline-flex rounded border border-slate-600 bg-slate-900 p-0.5 shadow-sm" role="group">
+        <button id="toggle-operational-stations-btn" type="button" class="px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white shadow transition-all flex items-center gap-1" title="Show only stations on Howrah-Barddhaman and Sealdah corridors">
+          <span>🎯</span> Operational Corridors Only
+        </button>
+        <button id="toggle-all-stations-btn" type="button" class="px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-1" title="Show all 8,697 stations across India">
+          <span>🌐</span> All India (8,697)
+        </button>
+      </div>
+
+      <!-- Toggle Demo Corridors (Demonstration Network) -->
+      <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white text-xs pl-1 border-l border-slate-700 pl-2">
+        <input type="checkbox" id="toggle-demo-corridors" checked class="rounded bg-slate-900 border-slate-600 text-emerald-500">
+        <span class="text-[11px] text-slate-300">Show Demo Trunks</span>
+      </label>
+
+      <!-- Quick View Shortcuts -->
+      <div class="flex items-center gap-1 border-l border-slate-700 pl-2">
+        <button onclick="map.flyTo([22.95, 88.20], 10, { duration: 1.2 })" class="rounded bg-slate-700 hover:bg-slate-600 px-2 py-1 text-[11px] font-semibold text-slate-200" title="Focus Howrah Hub">
+          HWH Hub
+        </button>
+        <button onclick="map.flyTo([22.90, 88.45], 10, { duration: 1.2 })" class="rounded bg-slate-700 hover:bg-slate-600 px-2 py-1 text-[11px] font-semibold text-slate-200" title="Focus Sealdah Corridor">
+          SDAH Line
+        </button>
+      </div>
+
+      <!-- Simulation Controls & Live Clock -->
+      <div class="flex items-center gap-1.5 border-l border-slate-700 pl-2">
+        <button id="sim-toggle-btn" type="button" class="rounded border border-emerald-500 bg-emerald-950 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-900 flex items-center gap-1" title="Pause or Resume Train Movement">
+          <span id="sim-icon">⏸</span> <span id="sim-text">Sim</span>
+        </button>
+        <span class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 text-cyan-300 text-[11px] px-2 py-0.5 rounded font-mono font-bold shadow-inner">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="sim-clock-display">Live IST</span>
+        </span>
+        <select id="sim-time-preset" onchange="handleTimePresetChange(this.value)" class="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200 focus:outline-none font-medium cursor-pointer" title="Switch Simulation Time">
+          <option value="live" selected>● Real-Time (Live IST)</option>
+          <option value="08:30">🌅 08:30 AM Peak Rush</option>
+          <option value="11:30">🕚 11:30 AM Midday</option>
+          <option value="14:00">☀️ 14:00 PM Afternoon</option>
+          <option value="18:30">🌆 18:30 PM Evening Rush</option>
+          <option value="21:00">🌙 21:00 PM Night</option>
+          <option value="custom">✏️ Custom Time...</option>
+        </select>
+        <input id="custom-time-input" type="time" onchange="applyCustomTime(this.value)" class="hidden rounded border border-cyan-500 bg-slate-950 px-1.5 py-0.5 text-xs text-white font-mono w-20 text-center focus:outline-none" />
+        <span id="sim-train-badge" class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 text-[11px] px-2 py-0.5 rounded font-mono font-bold flex items-center gap-1" title="Real-time trains currently moving on corridor tracks">
+          <span>🚆</span> <span id="sim-train-count">54</span> <span class="text-[10px] font-normal text-emerald-400">Moving</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Map Container with Collapsible Left Console -->
+  <div class="relative flex-1 flex min-h-0">
+
+    <!-- Floating Interactive Sidebar (Faults, Trains & Corridors) -->
+    <aside id="side-panel" class="w-80 md:w-96 bg-slate-950/95 border-r border-slate-800 flex flex-col z-20 transition-all duration-300 shrink-0">
+      <!-- Panel Header Tabs -->
+      <div class="flex border-b border-slate-800 bg-slate-900 text-xs font-semibold">
+        <button id="tab-faults-btn" type="button" class="flex-1 py-2 text-center border-b-2 border-red-500 text-red-400 bg-slate-950 flex items-center justify-center gap-1 transition-colors">
+          <span>⚠️</span> Faults (<span id="faults-tab-count">8</span>)
+        </button>
+        <button id="tab-clusters-btn" type="button" class="flex-1 py-2 text-center text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center gap-1 transition-colors">
+          <span>⚡</span> Clusters (3)
+        </button>
+        <button id="tab-trains-btn" type="button" class="flex-1 py-2 text-center text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center gap-1 transition-colors">
+          <span>🚆</span> Trains (<span id="trains-tab-count">...</span>)
+        </button>
+        <button id="tab-corridors-btn" type="button" class="flex-1 py-2 text-center text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center gap-1 transition-colors">
+          <span>🛤️</span> Corridors (<span id="corridors-tab-count">5+8</span>)
+        </button>
+      </div>
+
+      <!-- Manager Fault Filter Console (Category & Severity) -->
+      <div id="fault-filter-bar" class="p-2 border-b border-slate-800 bg-slate-900/70 space-y-1.5 text-[11px]">
+        <!-- Row 1: 3 Primary Department Categories (Track, Traction, Signal) -->
+        <div class="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-800/80">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">Category:</span>
+          <button type="button" onclick="filterFaultCategory('ALL')" id="cat-filter-all" class="cat-chip rounded bg-blue-950 border border-blue-500 px-2 py-0.5 text-blue-200 font-bold shrink-0">ALL (8)</button>
+          <button type="button" onclick="filterFaultCategory('Track')" id="cat-filter-track" class="cat-chip rounded bg-slate-800 border border-slate-700 px-2 py-0.5 text-red-300 hover:bg-slate-700 font-medium shrink-0 flex items-center gap-1">
+            <span>🛤️</span> Track (4)
+          </button>
+          <button type="button" onclick="filterFaultCategory('Traction')" id="cat-filter-traction" class="cat-chip rounded bg-slate-800 border border-slate-700 px-2 py-0.5 text-orange-300 hover:bg-slate-700 font-medium shrink-0 flex items-center gap-1">
+            <span>⚡</span> Traction (2)
+          </button>
+          <button type="button" onclick="filterFaultCategory('Signal')" id="cat-filter-signal" class="cat-chip rounded bg-slate-800 border border-slate-700 px-2 py-0.5 text-yellow-300 hover:bg-slate-700 font-medium shrink-0 flex items-center gap-1">
+            <span>🚥</span> Signal (2)
+          </button>
+        </div>
+
+        <!-- Row 2: Severity Levels -->
+        <div class="flex items-center gap-1 overflow-x-auto pt-0.5">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">Severity:</span>
+          <button type="button" onclick="filterFaultSeverity('ALL')" id="sev-filter-all" class="sev-chip rounded bg-blue-950 border border-blue-500 px-1.5 py-0.5 text-blue-200 font-bold shrink-0">ALL</button>
+          <button type="button" onclick="filterFaultSeverity('CRITICAL')" id="sev-filter-crit" class="sev-chip rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-red-400 hover:bg-slate-700 font-medium shrink-0">P1 Crit (3)</button>
+          <button type="button" onclick="filterFaultSeverity('HIGH')" id="sev-filter-high" class="sev-chip rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-amber-400 hover:bg-slate-700 font-medium shrink-0">P1 High (2)</button>
+          <button type="button" onclick="filterFaultSeverity('MEDIUM')" id="sev-filter-med" class="sev-chip rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-yellow-400 hover:bg-slate-700 font-medium shrink-0">P2 Med (1)</button>
+          <button type="button" onclick="filterFaultSeverity('ROUTINE')" id="sev-filter-routine" class="sev-chip rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-cyan-400 hover:bg-slate-700 font-medium shrink-0">P3 Routine (2)</button>
+        </div>
+      </div>
+
+      <!-- Content 1: Fault Cards List -->
+      <div id="faults-list-container" class="flex-1 overflow-y-auto p-3 space-y-2.5 divide-y divide-slate-800/50">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Content 2: Spatio-Temporal Mega-Block Clusters List (Hidden by default) -->
+      <div id="clusters-list-container" class="flex-1 overflow-y-auto p-3 space-y-2.5 hidden">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Content 3: Live Trains List (Hidden by default) -->
+      <div id="trains-list-container" class="flex-1 overflow-y-auto p-3 space-y-2 hidden">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Content 4: All Corridors List (Hidden by default) -->
+      <div id="corridors-list-container" class="flex-1 overflow-y-auto p-3 space-y-2.5 hidden">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Footer Action -->
+      <div class="border-t border-slate-800 bg-slate-900 p-2.5 text-center text-[11px] text-slate-400">
+        <div class="flex items-center justify-between">
+          <span>CRIS GIS Solver v5.1</span>
+          <a href="/index.html" class="text-blue-400 hover:underline font-semibold flex items-center gap-1">
+            Go to Mega-Block Timetable &rarr;
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Map Canvas -->
+    <main class="flex-1 relative min-w-0">
+      <div id="map"></div>
+
+      <!-- Map Legend Overlay -->
+      <div class="absolute bottom-4 left-4 z-10 rounded-md border border-slate-700 bg-slate-950/95 p-3 text-xs text-slate-200 shadow-xl backdrop-blur-sm pointer-events-auto max-w-[320px]">
+        <div class="flex items-center justify-between mb-1.5 border-b border-slate-800 pb-1">
+          <b class="text-amber-400 font-bold uppercase tracking-wider text-[11px]">Primary Working Network</b>
+          <span class="text-[10px] text-emerald-300 font-mono">HWH & SDAH</span>
+        </div>
+        <div class="space-y-1 text-[11px] max-h-56 overflow-y-auto pr-1">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-0.5">🌟 Primary Working Corridors</div>
+          <div class="flex items-center gap-2"><span class="h-2 w-4 rounded bg-blue-500 inline-block"></span> <span>Howrah - Barddhaman Main Line</span></div>
+          <div class="flex items-center gap-2"><span class="h-2 w-4 rounded bg-emerald-500 inline-block"></span> <span>Howrah - Barddhaman Chord Line</span></div>
+          <div class="flex items-center gap-2"><span class="h-2 w-4 rounded bg-purple-500 inline-block"></span> <span>Sealdah - Krishnanagar Line (SDAH)</span></div>
+          <div class="flex items-center gap-2"><span class="h-2 w-4 rounded bg-indigo-500 inline-block"></span> <span>Sheoraphuli - Tarakeswar Branch</span></div>
+          <div class="flex items-center gap-2"><span class="h-2 w-4 rounded bg-pink-500 inline-block"></span> <span>Bandel - Katwa Line</span></div>
+          <div class="flex items-center gap-2"><span class="h-2 w-4 rounded bg-cyan-500 inline-block"></span> <span>Barddhaman - Asansol Trunk Section</span></div>
+          
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-1.5 border-t border-slate-800">🏷️ Demonstration Trunks (Reference)</div>
+          <div class="flex items-center gap-2"><span class="h-1.5 w-4 rounded bg-yellow-400 border border-dashed border-white inline-block"></span> <span class="text-slate-300">[DEMO] Howrah - New Delhi Trunk</span></div>
+          <div class="flex items-center gap-2"><span class="h-1.5 w-4 rounded bg-sky-400 border border-dashed border-white inline-block"></span> <span class="text-slate-300">[DEMO] Howrah - Mumbai Trunk</span></div>
+          <div class="flex items-center gap-2"><span class="h-1.5 w-4 rounded bg-green-400 border border-dashed border-white inline-block"></span> <span class="text-slate-300">[DEMO] Howrah - Chennai East Coast</span></div>
+          <div class="flex items-center gap-2"><span class="h-1.5 w-4 rounded bg-teal-400 border border-dashed border-white inline-block"></span> <span class="text-slate-300">[DEMO] Delhi - Mumbai Western Trunk</span></div>
+
+          <div class="border-t border-slate-800 pt-1.5 mt-1 space-y-1">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">🏢 Problem Categories (3 Depts)</div>
+            <div class="flex items-center gap-2"><span class="px-1.5 py-0.5 rounded bg-red-950/80 border border-red-500 text-red-300 font-bold text-[9px]">🛤️ TRACK</span> <span class="text-slate-300 text-[10px]">P-Way, Rail Fractures, Gauge, USFD</span></div>
+            <div class="flex items-center gap-2"><span class="px-1.5 py-0.5 rounded bg-orange-950/80 border border-orange-500 text-orange-300 font-bold text-[9px]">⚡ TRACTION</span> <span class="text-slate-300 text-[10px]">25kV OHE, Dropper Sag, Contact Wire</span></div>
+            <div class="flex items-center gap-2"><span class="px-1.5 py-0.5 rounded bg-yellow-950/80 border border-yellow-500 text-yellow-300 font-bold text-[9px]">🚥 SIGNAL</span> <span class="text-slate-300 text-[10px]">Point Machines, Interlocking, DAC</span></div>
+
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-1.5 border-t border-slate-800">⚠️ Fault Severity Circles</div>
+            <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-red-500 border border-white inline-block animate-ping"></span> <span class="font-bold text-red-400">🔴 P1 Critical Circle (15-20 km/h PSR)</span></div>
+            <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-orange-500 border border-white inline-block"></span> <span class="font-bold text-orange-400">🟠 P1 High Circle (30-40 km/h PSR)</span></div>
+            <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-yellow-400 border border-white inline-block"></span> <span class="font-bold text-yellow-300">🟡 P2 Medium Circle (20-45 km/h PSR)</span></div>
+            <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-cyan-400 border border-white inline-block"></span> <span class="font-bold text-cyan-300">🔵 P3 Routine Circle (Bridge/DAC)</span></div>
+            <div class="flex items-center gap-2 pt-1 border-t border-slate-800"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400 border border-white inline-block"></span> <span>Major Railway Junction ⭐</span></div>
+            <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-blue-400 inline-block"></span> <span>Operational Station (HWH & SDAH)</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 z-50 hidden rounded-md bg-slate-950 border border-slate-700 px-4 py-3 text-xs font-semibold text-white shadow-2xl transition-all"></div>
+
+  <!-- Application Logic -->
+  <script>
+    function showToast(msg, ms = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, ms);
+    }
+
+    // 1. Check Authentication and Sync User Profile
+    async function syncAuth() {
+      let user = null;
+      try {
+        const res = await fetch('/api/me');
+        if (res.ok) {
+          const d = await res.json();
+          if (d.authenticated && d.user) user = d.user;
+        }
+      } catch (e) {}
+
+      if (!user) {
+        const stored = localStorage.getItem('samanvay_user');
+        if (stored) {
+          try { user = JSON.parse(stored); } catch (e) {}
+        }
+      }
+
+      if (!user) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      document.getElementById('user-display-name').textContent = user.name || 'Railway Official';
+      document.getElementById('user-display-role').textContent = user.roleTitle || 'Divisional Engineer';
+    }
+    syncAuth();
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      try { await fetch('/api/logout', { method: 'POST' }); } catch (e) {}
+      localStorage.removeItem('samanvay_user');
+      window.location.href = '/login.html';
+    });
+
+    // 2. Initialize Leaflet Map (Centered between Howrah & Sealdah Networks)
+    const map = L.map('map', {
+      center: [22.92, 88.35],
+      zoom: 10,
+      zoomControl: true,
+      preferCanvas: true
+    });
+
+    const stationCanvasRenderer = L.canvas({ padding: 0.5 });
+    const CARTO_KEY = 'cb1_3fkr_1_435e0d3fd52d7d063c6d47e4';
+
+    // 1. CARTO Dark Matter (High-contrast dark operations radar)
+    const cartoDark = L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${CARTO_KEY}`, {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
+    }).addTo(map);
+
+    // 2. CARTO Voyager (Detailed, clean colored navigation map)
+    const cartoVoyager = L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${CARTO_KEY}`, {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
+    });
+
+    // 3. OpenStreetMap standard
+    const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19
+    });
+
+    // Layer Groups
+    const primaryTracksLayerGroup = L.layerGroup().addTo(map);
+    const demoTracksLayerGroup = L.layerGroup().addTo(map);
+    const operationalStationsLayerGroup = L.layerGroup().addTo(map); // Default active: only operational stations
+    const allIndiaLayerGroup = L.layerGroup(); // Added only on toggle
+    const faultsLayerGroup = L.layerGroup().addTo(map);
+    const clustersLayerGroup = L.layerGroup().addTo(map);
+    const trainsLayerGroup = L.layerGroup().addTo(map);
+
+    L.control.layers({
+      "CARTO Dark Matter (Active)": cartoDark,
+      "CARTO Voyager (Day/Color)": cartoVoyager,
+      "OpenStreetMap (Standard)": osmTiles
+    }, {
+      "Mega-Block Clusters": clustersLayerGroup,
+      "Faults & PSRs": faultsLayerGroup,
+      "Live Trains": trainsLayerGroup
+    }, { position: 'topright' }).addTo(map);
+
+    let corridorData = null;
+    let faultsData = [];
+    let allStationsData = [];
+    let faultPolylines = {};
+    let faultMarkers = {};
+    let faultCircles = {};
+    let corridorPolylines = {};
+    let clusterLayers = {};
+
+    // Major Junction Set for highlighted green star badges
+    const MAJOR_JUNCTIONS = new Set([
+      'HWH', 'BLY', 'BDC', 'SHE', 'KQU', 'SKG', 'BWN', 'DKAE', 
+      'SDAH', 'DDJ', 'BP', 'NH', 'KYI', 'RHA', 'KNJ', 'TAK',
+      'ASN', 'KGP', 'SRC', 'NDLS', 'CNB', 'ALD', 'MGS', 'GAYA', 'DHN', 'GMO',
+      'TATA', 'ROU', 'BSP', 'R', 'NGP', 'BSL', 'CSTM', 'MAS', 'BZA', 'VSKP'
+    ]);
+
+    // 3. Load Corridor Network & Draw Tracks
+    async function loadCorridorNetwork() {
+      try {
+        const res = await fetch('/api/network?_t=' + Date.now());
+        corridorData = await res.json();
+
+        const primary = corridorData.primary_corridors || corridorData.regional_corridors || [];
+        const demo = corridorData.demo_corridors || corridorData.national_corridors || [];
+
+        const tabCountEl = document.getElementById('corridors-tab-count');
+        if (tabCountEl) tabCountEl.textContent = `${primary.length}+${demo.length}`;
+
+        // 3a. Draw Primary Operational Corridors (Using exact curved GIS coordinates)
+        primary.forEach(corridor => {
+          const coords = (corridor.coordinates && corridor.coordinates.length > 1)
+            ? corridor.coordinates
+            : corridor.stations.map(s => [s.lat, s.long]);
+          if (coords.length > 1) {
+            const isSealdah = corridor.id === 'sdah_main_corridor';
+            const poly = L.polyline(coords, {
+              color: corridor.color || '#3b82f6',
+              weight: isSealdah ? 5 : 4.5,
+              opacity: 0.95
+            });
+
+            poly.bindPopup(`
+              <div style="font-size:12px; line-height:1.5;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                  <span style="background:#059669; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:3px;">PRIMARY OPERATIONAL</span>
+                  <b style="color:${corridor.color}; font-size:13px;">${corridor.name}</b>
+                </div>
+                <b>Classification:</b> ${corridor.route_type}<br>
+                <b>Division:</b> ${corridor.division}<br>
+                <b>Stations:</b> ${corridor.station_count} operational stations<br>
+                <div style="margin-top:6px; color:#38bdf8; font-weight:bold;">Active Maintenance & Mega-Block Corridor</div>
+              </div>
+            `);
+
+            poly.addTo(primaryTracksLayerGroup);
+            corridorPolylines[corridor.id] = poly;
+          }
+        });
+
+        // 3b. Draw Demonstration Trunks (Dashed Lines)
+        demo.forEach(corridor => {
+          const coords = corridor.stations.map(s => [s.lat, s.long]);
+          if (coords.length > 1) {
+            const poly = L.polyline(coords, {
+              color: corridor.color || '#64748b',
+              weight: 3,
+              opacity: 0.65,
+              dashArray: '6, 6'
+            });
+
+            poly.bindPopup(`
+              <div style="font-size:12px; line-height:1.5;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                  <span style="background:#475569; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:3px;">DEMONSTRATION</span>
+                  <b style="color:${corridor.color}; font-size:13px;">${corridor.name}</b>
+                </div>
+                <b>Classification:</b> ${corridor.route_type}<br>
+                <b>Division:</b> ${corridor.division}<br>
+                <b>Major Hubs:</b> ${corridor.station_count} key nodes<br>
+                <div style="margin-top:6px; color:#94a3b8;">Reference Trunk Network (Demonstration Only)</div>
+              </div>
+            `);
+
+            poly.addTo(demoTracksLayerGroup);
+            corridorPolylines[corridor.id] = poly;
+          }
+        });
+
+        // 3c. Draw Operational Corridor Stations
+        drawOperationalCorridorStations(primary);
+
+        // 3d. Populate the Corridors tab in sidebar
+        renderCorridorsList(primary, demo);
+      } catch (err) {
+        console.error("Failed loading corridor network:", err);
+      }
+    }
+
+    // Station Icons
+    function getStationIcon(stn, isJunction, isSealdah) {
+      if (isJunction) {
+        return L.divIcon({
+          className: 'custom-stn-junction',
+          html: `
+            <div style="background: ${isSealdah ? '#7c3aed' : '#059669'}; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 2px solid ${isSealdah ? '#c084fc' : '#34d399'}; box-shadow: 0 0 10px rgba(0,0,0,0.8); white-space: nowrap; transform: translate(-50%, -50%); cursor:pointer;">
+              ⭐ ${stn.code}
+            </div>
+          `
+        });
+      }
+      return L.divIcon({
+        className: 'custom-stn-halt',
+        html: `
+          <div style="background: #0f172a; color: ${isSealdah ? '#e9d5ff' : '#cbd5e1'}; font-weight: 600; font-size: 9px; padding: 1px 4px; border-radius: 3px; border: 1px solid ${isSealdah ? '#a855f7' : '#3b82f6'}; white-space: nowrap; transform: translate(-50%, -50%); cursor:pointer;">
+            ${stn.code}
+          </div>
+        `
+      });
+    }
+
+    function drawOperationalCorridorStations(primaryCorridors) {
+      operationalStationsLayerGroup.clearLayers();
+      const addedCodes = new Set();
+
+      primaryCorridors.forEach(c => {
+        const isSealdah = c.id.includes('sdah') || c.name.includes('Sealdah');
+        c.stations.forEach(stn => {
+          if (addedCodes.has(stn.code)) return;
+          addedCodes.add(stn.code);
+
+          const isJunc = MAJOR_JUNCTIONS.has(stn.code);
+          const marker = L.marker([stn.lat, stn.long], {
+            icon: getStationIcon(stn, isJunc, isSealdah)
+          });
+
+          marker.bindPopup(`
+            <div style="font-size: 12px; line-height: 1.5;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:4px; margin-bottom:4px;">
+                <b style="color: ${isSealdah ? '#c084fc' : '#60a5fa'}; font-size: 13px;">${stn.name} (${stn.code})</b>
+                <span style="background:${isJunc ? '#059669' : '#334155'}; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:3px;">
+                  ${isJunc ? '⭐ JUNCTION' : 'STATION'}
+                </span>
+              </div>
+              <div><b>Line:</b> ${c.name}</div>
+              <div><b>Zone / Division:</b> ${stn.zone || 'ER'} (${c.division})</div>
+              <div><b>Coordinates:</b> ${stn.lat.toFixed(4)} N, ${stn.long.toFixed(4)} E</div>
+              <div style="margin-top:6px;">
+                <button onclick="map.setView([${stn.lat}, ${stn.long}], 14)" style="background:#2563eb; color:#fff; border:none; padding:3px 8px; border-radius:3px; font-size:11px; cursor:pointer;">
+                  Zoom In
+                </button>
+              </div>
+            </div>
+          `);
+
+          marker.addTo(operationalStationsLayerGroup);
+        });
+      });
+    }
+
+    function renderCorridorsList(primary, demo) {
+      const container = document.getElementById('corridors-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Corridor search filter
+      const filterWrapper = document.createElement('div');
+      filterWrapper.className = 'sticky top-0 z-10 bg-slate-950 pb-2 border-b border-slate-800';
+      filterWrapper.innerHTML = `
+        <input type="text" id="corridor-filter-input" placeholder="Search primary & demo corridors..." class="w-full rounded bg-slate-900 border border-slate-700 px-2.5 py-1 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-400">
+      `;
+      container.appendChild(filterWrapper);
+
+      const listContent = document.createElement('div');
+      listContent.id = 'corridors-cards-wrapper';
+      listContent.className = 'space-y-2.5 pt-1';
+      container.appendChild(listContent);
+
+      function buildCards(priList, demoList) {
+        listContent.innerHTML = '';
+
+        // Primary section
+        if (priList.length > 0) {
+          const priHeader = document.createElement('div');
+          priHeader.className = 'text-[11px] font-bold text-emerald-400 uppercase tracking-wider px-1 pt-1 flex items-center justify-between';
+          priHeader.innerHTML = `<span>🌟 Primary Working Corridors</span> <span class="bg-emerald-950 text-emerald-300 border border-emerald-700 px-1.5 py-0.2 rounded font-mono">${priList.length}</span>`;
+          listContent.appendChild(priHeader);
+
+          priList.forEach(c => {
+            const card = document.createElement('div');
+            const isSealdah = c.id.includes('sdah') || c.name.includes('Sealdah');
+            card.className = `p-2.5 rounded border ${isSealdah ? 'border-purple-800/80 bg-purple-950/30 hover:border-purple-400' : 'border-blue-800/80 bg-blue-950/30 hover:border-blue-400'} cursor-pointer transition-all text-xs`;
+            card.innerHTML = `
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                  <span class="h-3 w-3 rounded-full inline-block shrink-0" style="background:${c.color};"></span>
+                  <b class="text-white">${c.name}</b>
+                </span>
+                <span class="text-[10px] font-bold text-slate-200 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded">${c.station_count} Stns</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">${c.route_type}</p>
+              <div class="mt-1.5 flex items-center justify-between text-[10px] ${isSealdah ? 'text-purple-300' : 'text-blue-300'} border-t border-slate-800/80 pt-1">
+                <span>Operational Working Corridor</span>
+                <span>Focus Track &rarr;</span>
+              </div>
+            `;
+            card.addEventListener('click', () => focusCorridor(c.id));
+            listContent.appendChild(card);
+          });
+        }
+
+        // Demonstration section
+        if (demoList.length > 0) {
+          const demoHeader = document.createElement('div');
+          demoHeader.className = 'text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 pt-3 border-t border-slate-800 flex items-center justify-between';
+          demoHeader.innerHTML = `<span>🏷️ Demonstration National Trunks</span> <span class="bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-mono">${demoList.length}</span>`;
+          listContent.appendChild(demoHeader);
+
+          demoList.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'p-2 rounded border border-slate-800 bg-slate-900/40 hover:border-slate-500 cursor-pointer transition-all text-xs opacity-85 hover:opacity-100';
+            card.innerHTML = `
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                  <span class="h-2 w-3.5 rounded inline-block shrink-0" style="background:${c.color}; border: 1px dashed #fff;"></span>
+                  <b class="text-slate-200">${c.name}</b>
+                </span>
+                <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">${c.station_count} Hubs</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">${c.route_type}</p>
+              <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-0.5">
+                <span>Reference Route</span>
+                <span>Focus &rarr;</span>
+              </div>
+            `;
+            card.addEventListener('click', () => focusCorridor(c.id));
+            listContent.appendChild(card);
+          });
+        }
+      }
+
+      buildCards(primary, demo);
+
+      document.getElementById('corridor-filter-input').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        const filtPri = primary.filter(c => c.name.toLowerCase().includes(q) || c.route_type.toLowerCase().includes(q));
+        const filtDemo = demo.filter(c => c.name.toLowerCase().includes(q) || c.route_type.toLowerCase().includes(q));
+        buildCards(filtPri, filtDemo);
+      });
+    }
+
+    let activeHighlightPolyline = null;
+    function focusCorridor(corridorId) {
+      if (corridorPolylines[corridorId]) {
+        const poly = corridorPolylines[corridorId];
+        map.fitBounds(poly.getBounds(), { padding: [40, 40] });
+
+        if (activeHighlightPolyline) {
+          activeHighlightPolyline.setStyle({ weight: activeHighlightPolyline._origWeight });
+        }
+        poly._origWeight = poly.options.weight;
+        poly.setStyle({ weight: poly._origWeight + 3 });
+        poly.bringToFront();
+        activeHighlightPolyline = poly;
+
+        showToast(`Focused on corridor on map`);
+      }
+    }
+
+    // Toggle Demo Corridors Layer
+    document.getElementById('toggle-demo-corridors').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        map.addLayer(demoTracksLayerGroup);
+        showToast('Demonstration Trunk Lines Visible');
+      } else {
+        map.removeLayer(demoTracksLayerGroup);
+        showToast('Demonstration Trunk Lines Hidden (Only 2 Primary Lines Active)');
+      }
+    });
+
+    // 4. Load Faults from faults.json & Render Glowing/Pulsing Lines
+    async function loadFaults() {
+      try {
+        const res = await fetch('/api/faults?_t=' + Date.now());
+        const data = await res.json();
+        faultsData = data.faults || [];
+
+        document.getElementById('fault-count-badge').textContent = `${faultsData.length} Faults Detected`;
+        document.getElementById('faults-tab-count').textContent = faultsData.length;
+
+        // Update category chip counts for manager overview
+        const trackCount = faultsData.filter(f => (f.category || f.department) === 'Track').length;
+        const tractionCount = faultsData.filter(f => (f.category || f.department) === 'Traction').length;
+        const signalCount = faultsData.filter(f => (f.category || f.department) === 'Signal').length;
+
+        const btnAll = document.getElementById('cat-filter-all');
+        if (btnAll) btnAll.textContent = `ALL (${faultsData.length})`;
+        const btnTrack = document.getElementById('cat-filter-track');
+        if (btnTrack) btnTrack.innerHTML = `<span>🛤️</span> Track (${trackCount})`;
+        const btnTraction = document.getElementById('cat-filter-traction');
+        if (btnTraction) btnTraction.innerHTML = `<span>⚡</span> Traction (${tractionCount})`;
+        const btnSignal = document.getElementById('cat-filter-signal');
+        if (btnSignal) btnSignal.innerHTML = `<span>🚥</span> Signal (${signalCount})`;
+
+        const critCount = faultsData.filter(f => f.severity === 'CRITICAL').length;
+        const highCount = faultsData.filter(f => f.severity === 'HIGH').length;
+        const medCount = faultsData.filter(f => f.severity === 'MEDIUM').length;
+        const routineCount = faultsData.filter(f => f.severity === 'ROUTINE').length;
+
+        const btnCrit = document.getElementById('sev-filter-crit');
+        if (btnCrit) btnCrit.textContent = `P1 Crit (${critCount})`;
+        const btnHigh = document.getElementById('sev-filter-high');
+        if (btnHigh) btnHigh.textContent = `P1 High (${highCount})`;
+        const btnMed = document.getElementById('sev-filter-med');
+        if (btnMed) btnMed.textContent = `P2 Med (${medCount})`;
+        const btnRoutine = document.getElementById('sev-filter-routine');
+        if (btnRoutine) btnRoutine.textContent = `P3 Routine (${routineCount})`;
+
+        renderFaults(faultsData);
+        renderFaultCards(faultsData);
+      } catch (err) {
+        console.error("Failed loading faults:", err);
+      }
+    }
+
+    // Helper: 3 Problem Categories (Track, Traction, Signal)
+    function getFaultCategoryMeta(category) {
+      const cat = (category || '').toLowerCase();
+      if (cat === 'traction') {
+        return {
+          key: 'Traction',
+          name: 'Traction',
+          fullName: 'Traction (25kV OHE / Electrical)',
+          icon: '⚡',
+          color: '#f97316',
+          badgeBg: '#7c2d12',
+          badgeBorder: '#f97316',
+          badgeText: '#fdba74',
+          badgeClasses: 'bg-orange-950/80 border-orange-500 text-orange-300'
+        };
+      } else if (cat === 'signal') {
+        return {
+          key: 'Signal',
+          name: 'Signal',
+          fullName: 'Signal & Telecom (S&T / Interlocking)',
+          icon: '🚥',
+          color: '#eab308',
+          badgeBg: '#713f12',
+          badgeBorder: '#eab308',
+          badgeText: '#fde047',
+          badgeClasses: 'bg-yellow-950/80 border-yellow-500 text-yellow-300'
+        };
+      } else {
+        return {
+          key: 'Track',
+          name: 'Track',
+          fullName: 'Track (Civil Engineering / Permanent Way)',
+          icon: '🛤️',
+          color: '#ef4444',
+          badgeBg: '#7f1d1d',
+          badgeBorder: '#ef4444',
+          badgeText: '#fca5a5',
+          badgeClasses: 'bg-red-950/80 border-red-500 text-red-300'
+        };
+      }
+    }
+
+    function getFaultCircleConfig(f) {
+      if (f.severity === 'CRITICAL') {
+        return {
+          strokeColor: '#ef4444',
+          fillColor: '#dc2626',
+          glowColor: 'rgba(239, 68, 68, 0.65)',
+          badgeBg: '#b91c1c',
+          badgeBorder: '#f87171',
+          radiusMeters: 600,
+          icon: '🚨',
+          label: 'P1 CRITICAL',
+          chipColor: 'bg-red-950/70 border-red-500 text-red-300'
+        };
+      } else if (f.severity === 'HIGH') {
+        return {
+          strokeColor: '#f97316',
+          fillColor: '#ea580c',
+          glowColor: 'rgba(249, 115, 22, 0.65)',
+          badgeBg: '#c2410c',
+          badgeBorder: '#fb923c',
+          radiusMeters: 500,
+          icon: '⚡',
+          label: 'P1 HIGH',
+          chipColor: 'bg-orange-950/70 border-orange-500 text-orange-300'
+        };
+      } else if (f.severity === 'MEDIUM') {
+        return {
+          strokeColor: '#eab308',
+          fillColor: '#ca8a04',
+          glowColor: 'rgba(234, 179, 8, 0.65)',
+          badgeBg: '#854d0e',
+          badgeBorder: '#facc15',
+          radiusMeters: 420,
+          icon: '⚠️',
+          label: 'P2 MEDIUM',
+          chipColor: 'bg-amber-950/70 border-amber-500 text-amber-300'
+        };
+      } else {
+        return {
+          strokeColor: '#06b6d4',
+          fillColor: '#0891b2',
+          glowColor: 'rgba(6, 182, 212, 0.6)',
+          badgeBg: '#0e7490',
+          badgeBorder: '#22d3ee',
+          radiusMeters: 360,
+          icon: '📋',
+          label: 'P3 ROUTINE',
+          chipColor: 'bg-cyan-950/70 border-cyan-500 text-cyan-300'
+        };
+      }
+    }
+
+    function renderFaults(faults) {
+      faultsLayerGroup.clearLayers();
+      faultPolylines = {};
+      faultMarkers = {};
+      faultCircles = {};
+
+      faults.forEach(f => {
+        const cfg = getFaultCircleConfig(f);
+        const catMeta = getFaultCategoryMeta(f.category || f.department);
+
+        // 1. High-Visibility Geographic Zone Circle
+        const circle = L.circle([f.lat, f.long], {
+          radius: cfg.radiusMeters,
+          color: cfg.strokeColor,
+          fillColor: cfg.fillColor,
+          fillOpacity: 0.3,
+          weight: 3.5,
+          className: 'fault-geo-circle'
+        });
+
+        // 2. Track Segment Highlight Polyline under Circle (precisely following corridor vertices)
+        const segmentCoords = (f.track_segment && f.track_segment.length > 0) ? f.track_segment : [f.start_coords, f.end_coords];
+        const poly = L.polyline(segmentCoords, {
+          color: cfg.strokeColor,
+          weight: 6,
+          opacity: 0.9,
+          dashArray: '6, 6'
+        });
+
+        // 3. Central Sonar-Pulsing Circular Target Badge Marker with Distinct Category Label
+        const marker = L.marker([f.lat, f.long], {
+          icon: L.divIcon({
+            className: 'fault-circle-container',
+            html: `
+              <div style="position:relative; display:flex; align-items:center; justify-content:center; transform:translate(-50%, -50%); cursor:pointer;">
+                <!-- Radiating Sonar Wave -->
+                <div class="sonar-wave" style="border: 2.5px solid ${cfg.strokeColor}; background: ${cfg.glowColor};"></div>
+
+                <!-- Circular Multi-Layer Capsule Badge Explicitly Labeled for Manager -->
+                <div style="
+                  position: relative;
+                  background: #090d16;
+                  border: 2px solid ${cfg.badgeBorder};
+                  box-shadow: 0 0 18px ${cfg.glowColor}, 0 4px 14px rgba(0,0,0,0.9);
+                  color: #fff;
+                  border-radius: 9999px;
+                  padding: 3px 8px 3px 5px;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  white-space: nowrap;
+                  z-index: 10;
+                ">
+                  <!-- Category Pill Label (Track, Traction, Signal) -->
+                  <span style="
+                    background: ${catMeta.badgeBg};
+                    border: 1px solid ${catMeta.badgeBorder};
+                    color: ${catMeta.badgeText};
+                    font-size: 9px;
+                    font-weight: 800;
+                    padding: 2px 6px;
+                    border-radius: 9999px;
+                    letter-spacing: 0.5px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 3px;
+                  ">
+                    ${catMeta.icon} ${catMeta.name.toUpperCase()}
+                  </span>
+
+                  <!-- Code & Speed Restriction -->
+                  <div style="display:flex; flex-direction:column; line-height:1.15; text-align:left;">
+                    <b style="font-size:11px; color:#fff; letter-spacing:0.2px;">${f.task_code}</b>
+                    <span style="font-size:9px; font-weight:800; color:${cfg.strokeColor};">${f.speed_restriction_kmph} km/h</span>
+                  </div>
+                </div>
+              </div>
+            `
+          })
+        });
+
+        const popupContent = `
+          <div style="font-size:12px; min-width:260px; line-height:1.5;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:6px; margin-bottom:8px;">
+              <!-- Prominent Department Category Tag -->
+              <span style="background:${catMeta.badgeBg}; border:1px solid ${catMeta.badgeBorder}; color:${catMeta.badgeText}; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">
+                ${catMeta.icon} ${catMeta.name.toUpperCase()} DEPARTMENT
+              </span>
+              <!-- Severity Badge -->
+              <span style="background:${cfg.badgeBg}; border:1px solid ${cfg.strokeColor}; color:#fff; font-size:9px; font-weight:bold; padding:2px 6px; border-radius:4px;">
+                ${cfg.label}
+              </span>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+              <b style="color:${cfg.strokeColor}; font-size:14px; font-family:monospace;">${f.task_code}</b>
+              <span style="color:#94a3b8; font-size:11px;">(${f.line})</span>
+            </div>
+
+            <div style="color:#f1f5f9; font-weight:600; font-size:12.5px; margin-bottom:4px;">${f.fault_type}</div>
+            <div style="font-size:11px; color:#cbd5e1;"><b>Section:</b> ${f.location_name}</div>
+            <div style="font-size:11px; color:#cbd5e1;"><b>Chainage:</b> <span class="text-amber-300 font-bold">${f.chainage}</span> &bull; Stn: ${f.nearest_station}</div>
+            
+            <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:11px; background:#0f172a; padding:4px 6px; border-radius:3px;">
+              <span><b>Speed Restriction:</b> <span style="color:#f87171; font-weight:bold;">${f.speed_restriction_kmph} km/h</span></span>
+              <span><b>Mega-Block:</b> <span style="color:#facc15; font-weight:bold;">${f.required_block_duration_min} min</span></span>
+            </div>
+            <div style="font-size:10.5px; color:#94a3b8; margin-top:4px;"><b>Detected:</b> ${f.detected_time}</div>
+
+            <div style="margin-top:6px; background:#1e293b; border-left:3px solid ${catMeta.color}; padding:6px 8px; border-radius:3px; font-size:11px; color:#cbd5e1;">
+              <b style="color:${catMeta.badgeText};">Required Action:</b> ${f.action_required}
+            </div>
+
+            <div style="margin-top:8px; display:flex; gap:6px;">
+              <a href="/index.html?fault=${f.id}" style="background:#15803d; color:#fff; padding:4px 8px; border-radius:3px; font-size:11px; font-weight:bold; text-decoration:none; display:inline-block;">
+                Schedule in Planner &rarr;
+              </a>
+              <button onclick="map.setView([${f.lat}, ${f.long}], 15)" style="background:#334155; color:#fff; border:none; padding:4px 8px; border-radius:3px; font-size:11px; cursor:pointer;">
+                Zoom KM
+              </button>
+            </div>
+          </div>
+        `;
+
+        circle.bindPopup(popupContent);
+        poly.bindPopup(popupContent);
+        marker.bindPopup(popupContent);
+
+        circle.addTo(faultsLayerGroup);
+        poly.addTo(faultsLayerGroup);
+        marker.addTo(faultsLayerGroup);
+
+        faultCircles[f.id] = circle;
+        faultPolylines[f.id] = poly;
+        faultMarkers[f.id] = marker;
+      });
+    }
+
+    function renderFaultCards(faults) {
+      const container = document.getElementById('faults-list-container');
+      container.innerHTML = '';
+
+      if (faults.length === 0) {
+        container.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">No faults matching current Category / Severity filter.</p>';
+        return;
+      }
+
+      faults.forEach(f => {
+        const cfg = getFaultCircleConfig(f);
+        const catMeta = getFaultCategoryMeta(f.category || f.department);
+
+        const card = document.createElement('div');
+        card.className = `p-2.5 rounded border border-slate-800 bg-slate-900/60 hover:border-blue-400 cursor-pointer transition-all`;
+        card.style.borderLeft = `4px solid ${catMeta.color}`;
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-1">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <!-- 3 Category Label Pill -->
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded border ${catMeta.badgeClasses} flex items-center gap-1">
+                  <span>${catMeta.icon}</span> ${catMeta.name}
+                </span>
+                <!-- Severity Chip -->
+                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${cfg.chipColor}">
+                  ${cfg.icon} ${cfg.label}
+                </span>
+                <b class="text-xs text-white font-mono">${f.task_code}</b>
+              </div>
+
+              <p class="text-xs font-semibold text-slate-200 mt-1">${f.fault_type}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">
+                <span class="text-slate-300 font-medium">${f.line}</span> &bull; <b class="text-amber-300">${f.chainage}</b>
+              </p>
+            </div>
+
+            <div class="text-right shrink-0">
+              <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow inline-block" style="background:${cfg.badgeBg}; border:1px solid ${cfg.strokeColor};">
+                ${f.speed_restriction_kmph} km/h
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-2 flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1.5">
+            <span>Dept: <b style="color:${catMeta.badgeText};">${catMeta.fullName}</b></span>
+            <div class="flex items-center gap-2">
+              <a href="/index.html?fault=${f.id}" class="text-emerald-400 hover:underline font-bold" onclick="event.stopPropagation()">Plan &rarr;</a>
+              <span style="color:${cfg.strokeColor};" class="hover:underline font-semibold">Inspect &rarr;</span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          focusFaultOnMap(f.id);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function focusFaultOnMap(faultId) {
+      const f = faultsData.find(item => item.id === faultId);
+      if (!f) return;
+
+      map.flyTo([f.lat, f.long], 14, { duration: 1.2 });
+      setTimeout(() => {
+        if (faultMarkers[faultId]) {
+          faultMarkers[faultId].openPopup();
+        }
+      }, 1250);
+      showToast(`Inspecting ${f.task_code}: ${f.fault_type} (${f.chainage})`);
+    }
+
+    // Dynamic Multi-Filtering for Category (Track, Traction, Signal) and Severity
+    let activeCategoryFilter = 'ALL';
+    let activeSeverityFilter = 'ALL';
+
+    function filterFaultCategory(cat) {
+      activeCategoryFilter = cat;
+
+      document.querySelectorAll('.cat-chip').forEach(c => {
+        c.classList.remove('bg-blue-950', 'border-blue-500', 'font-bold');
+        c.classList.add('bg-slate-800', 'border-slate-700', 'font-medium');
+      });
+
+      const btnMap = {
+        'ALL': 'cat-filter-all',
+        'Track': 'cat-filter-track',
+        'Traction': 'cat-filter-traction',
+        'Signal': 'cat-filter-signal'
+      };
+      const activeBtn = document.getElementById(btnMap[cat]);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'border-slate-700', 'font-medium');
+        activeBtn.classList.add('bg-blue-950', 'border-blue-500', 'font-bold');
+      }
+
+      applyFaultFilters();
+      showToast(cat === 'ALL' ? 'Showing all department categories' : `Category: ${cat} faults filtered`);
+    }
+
+    function filterFaultSeverity(sev) {
+      activeSeverityFilter = sev;
+
+      document.querySelectorAll('.sev-chip').forEach(c => {
+        c.classList.remove('bg-blue-950', 'border-blue-500', 'font-bold');
+        c.classList.add('bg-slate-800', 'border-slate-700', 'font-medium');
+      });
+
+      const btnMap = {
+        'ALL': 'sev-filter-all',
+        'CRITICAL': 'sev-filter-crit',
+        'HIGH': 'sev-filter-high',
+        'MEDIUM': 'sev-filter-med',
+        'ROUTINE': 'sev-filter-routine'
+      };
+      const activeBtn = document.getElementById(btnMap[sev]);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'border-slate-700', 'font-medium');
+        activeBtn.classList.add('bg-blue-950', 'border-blue-500', 'font-bold');
+      }
+
+      applyFaultFilters();
+      showToast(sev === 'ALL' ? 'Showing all severity levels' : `Severity: ${sev} filtered`);
+    }
+
+    function applyFaultFilters() {
+      const filtered = faultsData.filter(f => {
+        const matchCat = (activeCategoryFilter === 'ALL' || (f.category || f.department) === activeCategoryFilter);
+        const matchSev = (activeSeverityFilter === 'ALL' || f.severity === activeSeverityFilter);
+        return matchCat && matchSev;
+      });
+
+      renderFaultCards(filtered);
+
+      // Synchronize map circles and markers
+      faultsData.forEach(f => {
+        const matches = (
+          (activeCategoryFilter === 'ALL' || (f.category || f.department) === activeCategoryFilter) &&
+          (activeSeverityFilter === 'ALL' || f.severity === activeSeverityFilter)
+        );
+
+        if (faultCircles[f.id]) {
+          if (matches) {
+            if (!faultsLayerGroup.hasLayer(faultCircles[f.id])) faultsLayerGroup.addLayer(faultCircles[f.id]);
+          } else {
+            faultsLayerGroup.removeLayer(faultCircles[f.id]);
+          }
+        }
+        if (faultMarkers[f.id]) {
+          if (matches) {
+            if (!faultsLayerGroup.hasLayer(faultMarkers[f.id])) faultsLayerGroup.addLayer(faultMarkers[f.id]);
+          } else {
+            faultsLayerGroup.removeLayer(faultMarkers[f.id]);
+          }
+        }
+        if (faultPolylines[f.id]) {
+          if (matches) {
+            if (!faultsLayerGroup.hasLayer(faultPolylines[f.id])) faultsLayerGroup.addLayer(faultPolylines[f.id]);
+          } else {
+            faultsLayerGroup.removeLayer(faultPolylines[f.id]);
+          }
+        }
+      });
+    }
+
+    // 5. 2D TRAIN SIMULATION ENGINE (Howrah - Barddhaman & Sealdah Corridors)
+    const SIM_TRAINS = [
+      {
+        id: '12313',
+        no: '12313 RAJDHANI',
+        type: 'Chord Line Up Express',
+        color: '#facc15', // Gold
+        speedKmph: 110,
+        route: 'chord',
+        progress: 0.15,
+        direction: 1
+      },
+      {
+        id: '13009',
+        no: '13009 DOON EXP',
+        type: 'Main Line Up Express',
+        color: '#38bdf8', // Sky Blue
+        speedKmph: 85,
+        route: 'main',
+        progress: 0.65,
+        direction: 1
+      },
+      {
+        id: '12019',
+        no: '12019 SHATABDI',
+        type: 'Howrah-Ranchi Shatabdi Express',
+        color: '#60a5fa', // Blue
+        speedKmph: 105,
+        route: 'main',
+        progress: 0.72,
+        direction: 1
+      },
+      {
+        id: '13010',
+        no: '13010 DOON EXP',
+        type: 'Main Line Down Express',
+        color: '#38bdf8',
+        speedKmph: 85,
+        route: 'main',
+        progress: 0.28,
+        direction: -1
+      },
+      {
+        id: '12314',
+        no: '12314 RAJDHANI',
+        type: 'Chord Line Down Rajdhani',
+        color: '#facc15',
+        speedKmph: 110,
+        route: 'chord',
+        progress: 0.78,
+        direction: -1
+      },
+      {
+        id: '37216',
+        no: '37216 LOCAL EMU',
+        type: 'Howrah-Bandel Local',
+        color: '#4ade80', // Green
+        speedKmph: 60,
+        route: 'main',
+        progress: 0.35,
+        direction: -1
+      },
+      {
+        id: '31825',
+        no: '31825 SDAH LOCAL',
+        type: 'Sealdah-Krishnanagar EMU',
+        color: '#c084fc', // Purple
+        speedKmph: 75,
+        route: 'sealdah',
+        progress: 0.40,
+        direction: 1
+      },
+      {
+        id: '31221',
+        no: '31221 BARRACKPORE',
+        type: 'Sealdah Suburban Local',
+        color: '#e879f9', // Pink
+        speedKmph: 65,
+        route: 'sealdah',
+        progress: 0.18,
+        direction: -1
+      },
+      {
+        id: '31818',
+        no: '31818 RANAGHAT',
+        type: 'Sealdah-Ranaghat Local',
+        color: '#c084fc',
+        speedKmph: 70,
+        route: 'sealdah',
+        progress: 0.82,
+        direction: -1
+      },
+      {
+        id: 'BOXN',
+        no: 'BOXN / 4A FREIGHT',
+        type: 'Coal Freight Train',
+        color: '#94a3b8', // Slate
+        speedKmph: 45,
+        route: 'chord',
+        progress: 0.85,
+        direction: -1
+      },
+      {
+        id: 'TOWER-01',
+        no: 'TOWER CAR 01',
+        type: 'Emergency OHE Van',
+        color: '#fb923c', // Orange
+        speedKmph: 35,
+        route: 'main',
+        progress: 0.48,
+        direction: 1
+      }
+    ];
+
+    let trainMarkers = {};
+    let isSimRunning = true;
+    let simSpeedMultiplier = 1;
+
+    function createFallbackTrainIcon(t) {
+      const isUp = t.direction !== undefined ? (t.direction >= 0) : true;
+      const flip = !isUp ? 'transform:scaleX(-1);' : '';
+      const parts = (t.no || '').trim().split(' ');
+      const trainNum = parts[0] || t.id;
+      const shortName = parts.slice(1).join(' ') || t.type;
+
+      const html = `
+        <div class="train-marker-wrapper" title="${t.no} (${isUp ? 'UP Train' : 'DOWN Train'})" style="position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center;">
+          <!-- Locomotive SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 28" width="48" height="22"
+               style="${flip}filter:drop-shadow(0 2px 6px rgba(0,0,0,.95));transition:transform 0.4s ease;">
+            <rect x="2" y="6" width="48" height="16" rx="4" fill="${t.color}" opacity="0.95"/>
+            <path d="M50 6 L62 9 L62 19 L50 22 Z" fill="${t.color}" opacity="0.9"/>
+            <rect x="7"  y="9" width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.45)"/>
+            <rect x="19" y="9" width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.45)"/>
+            <rect x="31" y="9" width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.45)"/>
+            <rect x="52" y="9" width="7" height="5" rx="1" fill="rgba(255,255,255,0.65)"/>
+            <circle cx="14" cy="23" r="3.5" fill="#0f172a" stroke="${t.color}" stroke-width="1.5"/>
+            <circle cx="28" cy="23" r="3.5" fill="#0f172a" stroke="${t.color}" stroke-width="1.5"/>
+            <circle cx="42" cy="23" r="3.5" fill="#0f172a" stroke="${t.color}" stroke-width="1.5"/>
+            <circle cx="56" cy="22" r="3" fill="#0f172a" stroke="${t.color}" stroke-width="1.5"/>
+            <circle cx="62" cy="14" r="2.5" fill="#fef08a" opacity="0.95"/>
+          </svg>
+
+          <!-- Container with Train Name/Number Box + Arrow directly to the right/beside the box -->
+          <div style="display:flex; align-items:center; gap:3.5px; margin-top:2px;">
+            <!-- Box where train name and number is placed -->
+            <div style="
+              background:rgba(10,15,30,0.96); color:#f8fafc;
+              font-size:9px; font-weight:700; padding:2px 7px; border-radius:5px;
+              border:1.5px solid ${t.color}; white-space:nowrap; display:flex; align-items:center;
+              gap:5px; box-shadow:0 3px 8px rgba(0,0,0,0.9); pointer-events:none; max-width:180px;">
+              <span style="color:${t.color};font-family:monospace;font-weight:900;font-size:9.5px;letter-spacing:0.3px;">${trainNum}</span>
+              <span style="overflow:hidden;text-overflow:ellipsis;color:#f1f5f9;font-size:8.5px;font-weight:700;max-width:115px;">${shortName}</span>
+            </div>
+
+            <!-- Arrow beside / right of the box where train name and number is placed -->
+            <div style="
+              background:${isUp ? 'rgba(6,78,59,0.96)' : 'rgba(136,19,55,0.96)'};
+              color:${isUp ? '#34d399' : '#fb7185'};
+              border:1.5px solid ${isUp ? '#10b981' : '#f43f5e'};
+              box-shadow:0 3px 8px rgba(0,0,0,0.9);
+              border-radius:4px; padding:1.5px 5px; font-size:9px; font-weight:900;
+              display:flex; align-items:center; gap:2px; white-space:nowrap; pointer-events:none;"
+              title="${isUp ? 'UP Direction Train (Outbound)' : 'DOWN Direction Train (Inbound)'}">
+              <span style="font-size:12px; line-height:1; font-weight:900;">${isUp ? '⬆' : '⬇'}</span>
+              <span style="font-size:8.5px; letter-spacing:0.4px; font-weight:900;">${isUp ? 'UP' : 'DN'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      return L.divIcon({
+        className: 'train-pin train-svg-icon',
+        html: html,
+        iconSize: [250, 46],
+        iconAnchor: [125, 16],
+        popupAnchor: [0, -20]
+      });
+    }
+
+    function initTrainMarkers() {
+      SIM_TRAINS.forEach(t => {
+        const isUp = t.direction !== undefined ? (t.direction >= 0) : true;
+        const marker = L.marker([22.58, 88.34], {
+          icon: createFallbackTrainIcon(t),
+          zIndexOffset: 900
+        });
+
+        marker.bindPopup(`
+          <div style="font-size:12px; line-height:1.5;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <b style="color:${t.color}; font-size:13px;">🚆 ${t.no}</b>
+              <span style="font-size:10px;background:${isUp ? '#064e3b' : '#881337'};color:${isUp ? '#34d399' : '#fb7185'};border:1px solid ${isUp ? '#10b981' : '#f43f5e'};padding:1.5px 6px;border-radius:4px;font-weight:900;">${isUp ? '⬆ UP TRAIN' : '⬇ DOWN TRAIN'}</span>
+            </div>
+            <b>Type:</b> ${t.type}<br>
+            <b>Speed:</b> ${t.speedKmph} km/h (Simulated)<br>
+            <b>Corridor:</b> ${t.route === 'main' ? 'Howrah-Barddhaman Main' : t.route === 'chord' ? 'Howrah-Barddhaman Chord' : 'Sealdah Main Corridor'}<br>
+            <div style="margin-top:6px; color:#34d399; font-weight:bold;">Status: In Motion (Block possession monitoring active)</div>
+            <div style="margin-top:6px;">
+              <a href="/index.html?train=${t.id}" style="background:#1e3a8a; color:#fff; padding:3px 8px; border-radius:3px; font-size:11px; text-decoration:none; display:inline-block; font-weight:bold;">
+                View in Timetable &rarr;
+              </a>
+            </div>
+          </div>
+        `, { maxWidth: 300, className: "train-popup-dark" });
+
+        marker.addTo(trainsLayerGroup);
+        trainMarkers[t.id] = marker;
+      });
+
+      renderFallbackTrainsList();
+    }
+
+    // ── Real-Train Integration via train_sim.js ───────────────────────────────────
+    // TrainSim global is defined in /static/train_sim.js (loaded at bottom of body)
+    let realTrainMode = false;   // Switches to true once real data is available
+
+    async function initRealTrainSim() {
+      try {
+        // Probe /api/real-trains — if trains available, hand off to TrainSim
+        const resp = await fetch('/api/real-trains');
+        const data = await resp.json();
+        const simCfg = data.sim_config || {};
+
+        // Apply time/day overrides from backend env if set
+        if (simCfg.sim_time) window.SAMANVAY_SIM_TIME = simCfg.sim_time;
+        if (simCfg.sim_day)  window.SAMANVAY_SIM_DAY  = simCfg.sim_day;
+
+        if (data.trains && data.trains.length > 0) {
+          realTrainMode = true;
+          // Stop old sim-loop animation (pauses it)
+          isSimRunning = false;
+          // Clear old placeholder markers
+          trainsLayerGroup.clearLayers();
+          trainMarkers = {};
+
+          // Init real simulation engine (from train_sim.js)
+          await window.TrainSim.init(map);
+
+          // Update sidebar trains tab with real train data
+          renderRealTrainsList(data.trains, simCfg);
+
+          const statusEl = document.getElementById('real-train-status');
+          if (statusEl) {
+            statusEl.textContent = `LIVE · ${simCfg.effective_time} IST (${simCfg.effective_day})`;
+            statusEl.className = 'bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold';
+          }
+          const trainsTabBtn = document.getElementById('tab-trains-btn');
+          if (trainsTabBtn) {
+            trainsTabBtn.innerHTML = `<span>🚆</span> Trains (<span id="trains-tab-count">${data.count}</span>)`;
+          }
+          showToast(`✅ ${data.count} real corridor trains loaded (${simCfg.effective_time} IST)`);
+        } else {
+          // No real data yet — show fallback + prompt
+          renderFallbackTrainsList();
+          const statusEl = document.getElementById('real-train-status');
+          if (statusEl) {
+            statusEl.textContent = 'DEMO · Run fetch_trains.py for live data';
+            statusEl.className = 'bg-slate-800 text-amber-300 border border-amber-700 text-[10px] px-2 py-0.5 rounded font-bold';
+          }
+          const trainsTabBtn = document.getElementById('tab-trains-btn');
+          if (trainsTabBtn) trainsTabBtn.innerHTML = `<span>🚆</span> Trains (<span id="trains-tab-count">Demo</span>)`;
+        }
+      } catch (e) {
+        console.warn('[RealTrain] Could not load real trains:', e);
+        renderFallbackTrainsList();
+      }
+    }
+
+    function normDay(d) {
+      if (!d) return "";
+      const s = String(d).trim().toLowerCase();
+      const map = { monday: "mon", tuesday: "tue", wednesday: "wed", thursday: "thu", friday: "fri", saturday: "sat", sunday: "sun" };
+      return map[s] || s.slice(0, 3);
+    }
+
+    function renderRealTrainsList(trains, simCfg) {
+      const container = document.getElementById('trains-list-container');
+      if (!container) return;
+
+      const todayDay = normDay(simCfg.effective_day || 'friday');
+      const CORRIDOR_COLORS = {
+        hwh_bwn_main:      '#06b6d4',
+        bly_bwn_asn_trunk: '#f59e0b',
+        bwn_asn_trunk:     '#f59e0b',
+        hwh_bwn_asn_line:  '#38bdf8',
+        sdah_knj_line:     '#a855f7',
+        hwh_skg_line:      '#22c55e',
+        hwh_sgkh_line:     '#22c55e',
+      };
+      const CORRIDOR_NAMES = {
+        hwh_bwn_main:      'Howrah–Barddhaman Main',
+        bly_bwn_asn_trunk: 'Bally–Barddhaman–Asansol Trunk',
+        bwn_asn_trunk:     'Bally–Barddhaman–Asansol Trunk',
+        hwh_bwn_asn_line:  'Howrah–Barddhaman–Asansol Line',
+        sdah_knj_line:     'Sealdah–Krishnanagar City',
+        hwh_skg_line:      'Howrah–Saktigarh',
+        hwh_sgkh_line:     'Howrah–Saktigarh',
+      };
+
+      container.innerHTML = `
+        <div class="px-2 py-2 border-b border-slate-800 bg-slate-900/80">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-300">Real-Time IST Timetable Simulation</span>
+            <span id="real-train-status" class="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">● LIVE</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-0.5 flex items-center justify-between">
+            <span>Clock: <b class="text-cyan-300 font-mono">${simCfg.effective_time} IST</b></span>
+            <span>Day: <b class="text-cyan-300 uppercase">${simCfg.effective_day}</b></span>
+          </div>
+        </div>
+      `;
+
+      // Group trains by corridor
+      const byCorr = {};
+      trains.forEach(t => {
+        if (!byCorr[t.corridor_id]) byCorr[t.corridor_id] = [];
+        byCorr[t.corridor_id].push(t);
+      });
+
+      for (const [corrId, corrTrains] of Object.entries(byCorr)) {
+        const color = CORRIDOR_COLORS[corrId] || '#64748b';
+        const corrName = CORRIDOR_NAMES[corrId] || corrId;
+
+        const header = document.createElement('div');
+        header.className = 'px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider border-b border-slate-800/80 flex items-center justify-between sticky top-0 bg-slate-950/95 backdrop-blur z-10';
+        header.style.color = color;
+        header.innerHTML = `
+          <span style="background:${color}20;border:1px solid ${color}40;padding:1px 6px;border-radius:4px;">${corrName}</span>
+          <span class="text-slate-400 font-mono font-normal">${corrTrains.length} trains</span>
+        `;
+        container.appendChild(header);
+
+        corrTrains.forEach(t => {
+          const runDaysNorm = (t.run_days || []).map(normDay);
+          const runsToday = !runDaysNorm.length || runDaysNorm.includes(todayDay);
+          // Ensure chronological stops: firstStop is departure origin, lastStop is terminus arrival
+          const stops = (function() {
+            const raw = t.corridor_stops || [];
+            if (raw.length < 2) return raw;
+            const t1 = raw[0].departure || raw[0].arrival;
+            const t2 = raw[raw.length - 1].arrival || raw[raw.length - 1].departure;
+            if (t1 && t2) {
+              const [h1, m1] = t1.split(':').map(Number);
+              const [h2, m2] = t2.split(':').map(Number);
+              const durFwd = (h2 * 60 + m2 - (h1 * 60 + m1) + 1440) % 1440;
+              const durRev = (h1 * 60 + m1 - (h2 * 60 + m2) + 1440) % 1440;
+              if (durRev < durFwd) return [...raw].reverse();
+            }
+            return raw;
+          })();
+          const firstStop = stops[0];
+          const lastStop = stops[stops.length - 1];
+
+          // Determine UP vs DOWN train
+          const name = (t.train_name || '').toUpperCase();
+          let isUp = true;
+          if (name.includes(' DOWN') || name.includes(' DN') || name.includes(' - HOWRAH') || name.includes(' - SEALDAH')) {
+            isUp = false;
+          } else if (name.includes(' UP') || name.startsWith('HOWRAH -') || name.startsWith('SEALDAH -')) {
+            isUp = true;
+          } else if (firstStop && (firstStop.station_code === 'HWH' || firstStop.station_code === 'SDAH')) {
+            isUp = true;
+          } else if (lastStop && (lastStop.station_code === 'HWH' || lastStop.station_code === 'SDAH')) {
+            isUp = false;
+          } else {
+            const num = parseInt(t.train_number, 10);
+            if (!isNaN(num) && num > 0) isUp = (num % 2 !== 0);
+          }
+
+          const item = document.createElement('div');
+          item.className = `p-2.5 rounded border cursor-pointer text-xs transition-all hover:border-opacity-80 ${runsToday ? 'border-slate-800 bg-slate-900/60 hover:border-cyan-700 hover:bg-slate-900' : 'border-slate-800/40 bg-slate-900/20 opacity-50'}`;
+          item.innerHTML = `
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 28" width="28" height="14" style="flex-shrink:0">
+                  <rect x="2" y="3" width="48" height="15" rx="4" fill="${color}" opacity="0.9"/>
+                  <path d="M50 3 L62 6 L62 14 L50 18 Z" fill="${color}" opacity="0.8"/>
+                  <circle cx="12" cy="20" r="3" fill="#1e293b" stroke="${color}" stroke-width="1.5"/>
+                  <circle cx="28" cy="20" r="3" fill="#1e293b" stroke="${color}" stroke-width="1.5"/>
+                  <circle cx="44" cy="20" r="3" fill="#1e293b" stroke="${color}" stroke-width="1.5"/>
+                </svg>
+                <b style="color:${color};" class="font-mono">${t.train_number}</b>
+                <span class="text-[9px] font-black px-1.5 py-0.5 rounded border ${isUp ? 'bg-emerald-950 text-emerald-300 border-emerald-700' : 'bg-rose-950 text-rose-300 border-rose-700'}">${isUp ? '⬆ UP' : '⬇ DN'}</span>
+                <span class="text-[10px] text-slate-400">${t.train_type || 'EXP'}</span>
+              </div>
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${runsToday ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-slate-800 text-slate-400 border-slate-700'}">${runsToday ? 'RUNS TODAY' : 'NOT TODAY'}</span>
+            </div>
+            <div class="text-[11px] text-slate-200 font-medium mb-1 truncate">${t.train_name || t.train_number}</div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/60 pt-1">
+              <span><b>${firstStop ? firstStop.station_code : '?'}</b> <b class="text-emerald-300 font-mono">${firstStop ? (firstStop.departure || firstStop.arrival || '--') : '--'}</b></span>
+              <span class="text-slate-600 font-mono">───➔</span>
+              <span><b class="text-red-300 font-mono">${lastStop ? (lastStop.arrival || lastStop.departure || '--') : '--'}</b> <b>${lastStop ? lastStop.station_code : '?'}</b></span>
+            </div>
+          `;
+
+          item.addEventListener('click', () => {
+            const inst = window.TrainSim ? window.TrainSim.getInstance() : null;
+            if (inst && inst.markers[t.train_number]) {
+              const marker = inst.markers[t.train_number];
+              map.flyTo(marker.getLatLng(), 11, { duration: 1.0 });
+              setTimeout(() => marker.openPopup(), 1100);
+            } else {
+              showToast(`Train ${t.train_number} is scheduled for a different time window`);
+            }
+          });
+
+          container.appendChild(item);
+        });
+      }
+    }
+
+    // Interactive Time Simulation Handlers
+    function handleTimePresetChange(val) {
+      const customInput = document.getElementById('custom-time-input');
+      if (val === 'live') {
+        if (customInput) customInput.classList.add('hidden');
+        if (window.TrainSim) window.TrainSim.resetToLive();
+        showToast("Simulation clock restored to Live Real-Time IST");
+      } else if (val === 'custom') {
+        if (customInput) {
+          customInput.classList.remove('hidden');
+          customInput.focus();
+        }
+      } else {
+        if (customInput) customInput.classList.add('hidden');
+        if (window.TrainSim) window.TrainSim.setTime(val);
+        showToast(`Simulation clock shifted to ${val} IST`);
+      }
+    }
+
+    function applyCustomTime(val) {
+      if (val && /^\d{1,2}:\d{2}$/.test(val.trim())) {
+        if (window.TrainSim) window.TrainSim.setTime(val.trim());
+        showToast(`Simulation clock shifted to ${val.trim()} IST`);
+      }
+    }
+
+    const simToggleBtn = document.getElementById('sim-toggle-btn');
+    if (simToggleBtn) {
+      simToggleBtn.addEventListener('click', () => {
+        const inst = window.TrainSim ? window.TrainSim.getInstance() : null;
+        if (!inst) return;
+        const icon = document.getElementById('sim-icon');
+        const text = document.getElementById('sim-text');
+        if (inst.running) {
+          inst.running = false;
+          if (icon) icon.textContent = '▶';
+          if (text) text.textContent = 'Paused';
+          simToggleBtn.className = 'rounded border border-amber-500 bg-amber-950 px-2 py-1 text-xs font-bold text-amber-300 hover:bg-amber-900 flex items-center gap-1';
+          showToast("Train simulation paused");
+        } else {
+          inst.running = true;
+          inst.tick();
+          if (icon) icon.textContent = '⏸';
+          if (text) text.textContent = 'Sim';
+          simToggleBtn.className = 'rounded border border-emerald-500 bg-emerald-950 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-900 flex items-center gap-1';
+          showToast("Train simulation running");
+        }
+      });
+    }
+
+    function renderFallbackTrainsList() {
+      const container = document.getElementById('trains-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Status banner prompting user to run fetch
+      const banner = document.createElement('div');
+      banner.className = 'mx-2 mt-2 mb-1 p-2 rounded border border-amber-800/60 bg-amber-950/30 text-[11px]';
+      banner.innerHTML = `
+        <div class="font-bold text-amber-300 mb-1">📡 Demo Simulation Mode</div>
+        <div class="text-slate-400">Real train data not loaded yet. Run <code class="text-amber-200 bg-slate-800 px-1 rounded">python fetch_trains.py</code> to populate the database with live RailRadar timetables.</div>
+        <button onclick="triggerFetch()" class="mt-2 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-3 py-1 cursor-pointer">Fetch Now (Admin)</button>
+      `;
+      container.appendChild(banner);
+
+      SIM_TRAINS.forEach(t => {
+        const isUp = t.direction !== undefined ? (t.direction >= 0) : true;
+        const item = document.createElement('div');
+        item.className = 'p-2.5 rounded border border-slate-800 bg-slate-900/60 hover:border-blue-500 cursor-pointer text-xs';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 28" width="28" height="14">
+                <rect x="2" y="3" width="48" height="15" rx="4" fill="${t.color}" opacity="0.9"/>
+                <path d="M50 3 L62 6 L62 14 L50 18 Z" fill="${t.color}" opacity="0.8"/>
+                <circle cx="12" cy="20" r="3" fill="#1e293b" stroke="${t.color}" stroke-width="1.5"/>
+                <circle cx="28" cy="20" r="3" fill="#1e293b" stroke="${t.color}" stroke-width="1.5"/>
+              </svg>
+              <b style="color:${t.color};">${t.no}</b>
+              <span class="text-[9px] font-black px-1.5 py-0.5 rounded border ${isUp ? 'bg-emerald-950 text-emerald-300 border-emerald-700' : 'bg-rose-950 text-rose-300 border-rose-700'}">${isUp ? '⬆ UP' : '⬇ DN'}</span>
+            </div>
+            <span class="text-[10px] font-bold text-amber-300 bg-amber-950/70 border border-amber-800 px-1.5 py-0.5 rounded">${t.speedKmph} km/h DEMO</span>
+          </div>
+          <p class="text-[11px] text-slate-300 mt-1">${t.type} · ${t.route.toUpperCase()} CORRIDOR</p>
+          <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1">
+            <span>Signal Aspect: <b class="text-emerald-400">GREEN</b></span>
+            <span class="text-amber-400 text-[9px] font-bold">DEMO DATA</span>
+          </div>
+        `;
+
+        item.addEventListener('click', () => {
+          if (trainMarkers[t.id]) {
+            map.panTo(trainMarkers[t.id].getLatLng());
+            trainMarkers[t.id].openPopup();
+          }
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    async function triggerFetch() {
+      try {
+        showToast('🚀 Triggering background fetch from RailRadar API…');
+        const resp = await fetch('/api/fetch-trains', { method: 'POST' });
+        const data = await resp.json();
+        showToast(data.message || 'Fetch started', 5000);
+      } catch (e) {
+        showToast('Failed to trigger fetch: ' + e.message);
+      }
+    }
+
+    let lastTime = null;
+    function animateSimulation(currentTime) {
+      if (!lastTime) {
+        lastTime = currentTime;
+      }
+      const rawDelta = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+      const delta = Math.min(Math.max(rawDelta, 0), 0.05);
+
+      if (isSimRunning && corridorData) {
+        const mainPts = (corridorData.main_line || []).map(s => [s.lat, s.long]);
+        const chordPts = (corridorData.chord_line || []).map(s => [s.lat, s.long]);
+        const sealdahPts = (corridorData.sealdah_line || []).map(s => [s.lat, s.long]);
+
+        SIM_TRAINS.forEach(t => {
+          const path = t.route === 'main' ? mainPts : t.route === 'chord' ? chordPts : sealdahPts;
+          if (!path || path.length < 2) return;
+
+          const rate = 0.007 * simSpeedMultiplier * delta * (t.speedKmph / 80);
+          t.progress += t.direction * rate;
+
+          if (t.progress >= 1.0) {
+            t.progress = 1.0;
+            if (t.direction !== -1) {
+              t.direction = -1;
+              if (trainMarkers[t.id]) trainMarkers[t.id].setIcon(createFallbackTrainIcon(t));
+            }
+          } else if (t.progress <= 0.0) {
+            t.progress = 0.0;
+            if (t.direction !== 1) {
+              t.direction = 1;
+              if (trainMarkers[t.id]) trainMarkers[t.id].setIcon(createFallbackTrainIcon(t));
+            }
+          }
+
+          const exactIdx = t.progress * (path.length - 1);
+          const i1 = Math.floor(exactIdx);
+          const i2 = Math.min(i1 + 1, path.length - 1);
+          const ratio = exactIdx - i1;
+
+          const p1 = path[i1];
+          const p2 = path[i2];
+
+          const curLat = p1[0] + (p2[0] - p1[0]) * ratio;
+          const curLng = p1[1] + (p2[1] - p1[1]) * ratio;
+
+          if (trainMarkers[t.id]) {
+            trainMarkers[t.id].setLatLng([curLat, curLng]);
+          }
+        });
+      }
+
+      requestAnimationFrame(animateSimulation);
+    }
+
+    // Simulation Controls
+    const oldSimToggle = document.getElementById('sim-toggle-btn');
+    if (oldSimToggle) {
+      oldSimToggle.addEventListener('click', () => {
+        const inst = window.TrainSim ? window.TrainSim.getInstance() : null;
+        if (inst) {
+          inst.running = !inst.running;
+          if (inst.running) inst.tick();
+          const icon = document.getElementById('sim-icon');
+          const text = document.getElementById('sim-text');
+          if (icon) icon.textContent = inst.running ? '⏸' : '▶';
+          if (text) text.textContent = inst.running ? 'Sim' : 'Paused';
+          showToast(inst.running ? 'Train Simulation Resumed' : 'Train Simulation Paused');
+        }
+      });
+    }
+
+    const simSpeedSel = document.getElementById('sim-speed-select');
+    if (simSpeedSel) {
+      simSpeedSel.addEventListener('change', (e) => {
+        simSpeedMultiplier = parseFloat(e.target.value);
+        showToast(`Simulation Speed: ${simSpeedMultiplier}x`);
+      });
+    }
+
+
+    // 5b. SPATIO-TEMPORAL MEGA-BLOCK CLUSTERS (Dynamic Backend Simulation with 15km Constraint)
+    const STORAGE_KEY_APPROVED_BLOCKS = 'samanvay_approved_blocks';
+    let currentClusterMaxKm = 15.0;
+    let showClusterHighlights = false; // MEGA-BLOCK HIGHLIGHT IS OFF BY DEFAULT ON MAP!
+    let simulatedClusters = [];
+    let excludedTasks = [];
+
+    function getApprovedBlocks() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY_APPROVED_BLOCKS);
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function isBlockApproved(clusterId) {
+      return getApprovedBlocks().includes(clusterId);
+    }
+
+    function toggleClusterApproval(clusterId) {
+      let list = getApprovedBlocks();
+      if (list.includes(clusterId)) {
+        list = list.filter(id => id !== clusterId);
+        showToast(`Revoked Mega-Block Approval for ${clusterId}`);
+      } else {
+        list.push(clusterId);
+        showToast(`Joint Mega-Block ${clusterId} APPROVED & Synced to Strategic Planner!`);
+      }
+      localStorage.setItem(STORAGE_KEY_APPROVED_BLOCKS, JSON.stringify(list));
+      updateClusterApprovalUI();
+    }
+
+    async function fetchSimulatedMegaBlocks(maxKm = 15.0) {
+      try {
+        currentClusterMaxKm = parseFloat(maxKm) || 15.0;
+        const res = await fetch(`/api/simulate-megablocks?max_km=${currentClusterMaxKm}&_t=${Date.now()}`);
+        const data = await res.json();
+        simulatedClusters = data.clusters || [];
+        excludedTasks = data.unclustered || [];
+
+        const tabBtn = document.getElementById('tab-clusters-btn');
+        if (tabBtn) tabBtn.innerHTML = `<span>⚡</span> Clusters (${simulatedClusters.length})`;
+
+        renderClustersList();
+
+        if (showClusterHighlights) {
+          renderClustersOnMap();
+        } else {
+          clustersLayerGroup.clearLayers();
+        }
+      } catch (err) {
+        console.error('Failed simulating mega-blocks from backend:', err);
+      }
+    }
+
+    function renderClustersOnMap() {
+      clustersLayerGroup.clearLayers();
+      clusterLayers = {};
+
+      if (!showClusterHighlights) return;
+
+      simulatedClusters.forEach(c => {
+        const approved = isBlockApproved(c.id);
+        const strokeCol = approved ? '#10b981' : (c.color || '#ef4444');
+        const fillCol = approved ? '#059669' : strokeCol;
+
+        // Bounding zone polygon
+        const rect = L.rectangle(c.bounds, {
+          color: strokeCol,
+          weight: 2.5,
+          dashArray: '6, 6',
+          fillColor: fillCol,
+          fillOpacity: 0.12
+        });
+
+        // Center badge marker
+        const marker = L.marker(c.center, {
+          icon: L.divIcon({
+            className: 'cluster-zone-badge',
+            html: `
+              <div style="
+                background: ${approved ? '#064e3b' : '#0f172a'};
+                border: 2px solid ${strokeCol};
+                box-shadow: 0 0 16px ${approved ? 'rgba(16,185,129,0.8)' : 'rgba(0,0,0,0.8)'};
+                color: #fff;
+                font-weight: 800;
+                font-size: 10px;
+                padding: 3px 8px;
+                border-radius: 6px;
+                white-space: nowrap;
+                transform: translate(-50%, -50%);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+              ">
+                <span>${approved ? '✅' : '⚡'}</span>
+                <span>${c.id}</span>
+                <span style="background:${strokeCol}; color:#fff; font-size:9px; padding:1px 4px; border-radius:3px;">${c.duration_min}m</span>
+              </div>
+            `
+          })
+        });
+
+        const popupContent = `
+          <div style="font-size:12px; min-width:280px; line-height:1.5;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:6px; margin-bottom:6px;">
+              <span style="background:${approved ? '#065f46' : '#7f1d1d'}; border:1px solid ${strokeCol}; color:#fff; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px;">
+                ${approved ? 'APPROVED & ACTIVE' : 'SIMULATED MEGA-BLOCK'}
+              </span>
+              <b style="color:${strokeCol}; font-mono font-size:13px;">${c.id}</b>
+            </div>
+            <b style="color:#f8fafc; font-size:13px;">${c.name}</b>
+            <div style="font-size:11px; color:#cbd5e1; margin-top:3px;"><b>Corridor:</b> ${c.corridor_name || c.corridor_id}</div>
+            <div style="font-size:11px; color:#10b981; font-weight:bold;"><b>Max Geographic Span:</b> ${c.max_span_km} km (Limit: &le; ${c.limit_km} km)</div>
+            <div style="font-size:11px; color:#38bdf8; margin-top:2px;"><b>Possession Window:</b> ${c.window}</div>
+            <div style="font-size:11px; color:#f59e0b;"><b>Concurrent Time Saved:</b> ${c.time_saved_min} minutes</div>
+
+            <div style="margin-top:6px; background:#0f172a; border-left:3px solid ${strokeCol}; padding:5px 8px; border-radius:3px;">
+              <div style="font-size:10px; font-weight:bold; color:#94a3b8; text-transform:uppercase; margin-bottom:3px;">Included Works (&le; ${c.limit_km} km limit):</div>
+              ${c.tasks.map(t => `
+                <div style="font-size:11px; color:#e2e8f0; display:flex; align-items:center; gap:4px; margin-top:2px;">
+                  <span>📌</span> <b>${t.code} (${t.dept}):</b> <span>${t.fault_type} (${t.nearest_station})</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="margin-top:8px; display:flex; gap:6px;">
+              <button onclick="toggleClusterApproval('${c.id}')" style="background:${approved ? '#b91c1c' : '#15803d'}; color:#fff; border:none; padding:4px 8px; border-radius:3px; font-size:11px; font-weight:bold; cursor:pointer;">
+                ${approved ? 'Revoke Approval' : 'Approve Mega-Block'}
+              </button>
+              <a href="/index.html?cluster=${c.id}" style="background:#1e3a8a; color:#fff; padding:4px 8px; border-radius:3px; font-size:11px; font-weight:bold; text-decoration:none; display:inline-block;">
+                Open in Timetable &rarr;
+              </a>
+            </div>
+          </div>
+        `;
+
+        rect.bindPopup(popupContent);
+        marker.bindPopup(popupContent);
+
+        rect.addTo(clustersLayerGroup);
+        marker.addTo(clustersLayerGroup);
+
+        clusterLayers[c.id] = { rect, marker };
+      });
+    }
+
+    function renderClustersList() {
+      const container = document.getElementById('clusters-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const approvedList = getApprovedBlocks();
+
+      // 1. Simulation Control Box
+      const controlBox = document.createElement('div');
+      controlBox.className = 'p-3 rounded-lg border border-slate-800 bg-slate-900/90 shadow space-y-2.5 text-xs';
+      controlBox.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-white flex items-center gap-1.5">
+            <span>⚡</span> Mega-Block Simulation Engine
+          </span>
+          <span class="text-[9px] bg-blue-950 text-blue-300 border border-blue-700 px-1.5 py-0.5 rounded font-mono font-bold">Backend DSS</span>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-tight">
+          Strict distance-constrained clustering. Defects separated by &gt; ${currentClusterMaxKm} km are excluded from joint blocks.
+        </p>
+
+        <div class="space-y-1.5 bg-slate-950/80 p-2 rounded border border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-semibold text-slate-300">Max Distance Limit:</span>
+            <div class="flex items-center gap-1">
+              <input type="number" id="sim-max-km-input" min="5" max="45" step="1" value="${currentClusterMaxKm}" class="w-14 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-center font-mono text-xs text-amber-300 font-bold focus:border-amber-400 focus:outline-none">
+              <span class="text-[11px] text-slate-400 font-bold">km</span>
+            </div>
+          </div>
+          <input type="range" id="sim-max-km-slider" min="5" max="35" step="1" value="${currentClusterMaxKm}" class="w-full accent-amber-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+          <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+            <span>5 km</span>
+            <span class="text-amber-400 font-bold">15 km (Default)</span>
+            <span>35 km</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-0.5">
+          <button id="btn-run-sim" type="button" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-1.5 px-2.5 rounded shadow flex items-center justify-center gap-1 text-xs transition-colors">
+            <span>⚡</span> Simulate Mega-Blocks
+          </button>
+          <button id="btn-toggle-highlights" type="button" class="px-2 py-1.5 rounded text-[11px] font-semibold border ${showClusterHighlights ? 'bg-indigo-950 border-indigo-500 text-indigo-300' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'} flex items-center gap-1 transition-colors">
+            <span>${showClusterHighlights ? '👁️' : '👁️‍🗨️'}</span>
+            <span>${showClusterHighlights ? 'Hide Highlights' : 'Show Highlights'}</span>
+          </button>
+        </div>
+
+        <div class="text-[10px] p-1.5 rounded border border-slate-800 bg-slate-950 text-slate-400 flex items-center justify-between font-mono">
+          <span>Clusters: <b class="text-emerald-400">${simulatedClusters.length}</b></span>
+          <span>Span Limit: <b class="text-amber-300">${currentClusterMaxKm} km</b></span>
+          <span>Excluded: <b class="text-rose-400">${excludedTasks.length}</b></span>
+        </div>
+      `;
+
+      container.appendChild(controlBox);
+
+      // Bind controls
+      const slider = controlBox.querySelector('#sim-max-km-slider');
+      const numberInput = controlBox.querySelector('#sim-max-km-input');
+      const simBtn = controlBox.querySelector('#btn-run-sim');
+      const toggleHighlightBtn = controlBox.querySelector('#btn-toggle-highlights');
+
+      slider.addEventListener('input', (e) => {
+        numberInput.value = e.target.value;
+      });
+      slider.addEventListener('change', (e) => {
+        fetchSimulatedMegaBlocks(e.target.value);
+        showToast(`Simulating mega-blocks with ${e.target.value} km limit...`);
+      });
+
+      numberInput.addEventListener('change', (e) => {
+        let val = Math.max(5, Math.min(50, parseFloat(e.target.value) || 15));
+        slider.value = val;
+        fetchSimulatedMegaBlocks(val);
+        showToast(`Simulating mega-blocks with ${val} km limit...`);
+      });
+
+      simBtn.addEventListener('click', () => {
+        const val = parseFloat(numberInput.value) || 15;
+        fetchSimulatedMegaBlocks(val);
+        showToast(`Executed Backend Simulation: limit ${val} km`);
+      });
+
+      toggleHighlightBtn.addEventListener('click', () => {
+        showClusterHighlights = !showClusterHighlights;
+        if (showClusterHighlights) {
+          renderClustersOnMap();
+          showToast(`Displaying simulated mega-block highlights on map`);
+        } else {
+          clustersLayerGroup.clearLayers();
+          showToast(`Mega-block highlights removed from map`);
+        }
+        renderClustersList();
+      });
+
+      // 2. Render Clusters Header
+      if (simulatedClusters.length > 0) {
+        const clHeader = document.createElement('div');
+        clHeader.className = 'text-[11px] font-bold text-slate-300 uppercase tracking-wider px-1 pt-1 flex items-center justify-between';
+        clHeader.innerHTML = `<span>Valid Multi-Dept Mega-Blocks</span> <span class="bg-emerald-950 text-emerald-300 border border-emerald-700 px-1.5 py-0.2 rounded font-mono">${simulatedClusters.length}</span>`;
+        container.appendChild(clHeader);
+      }
+
+      // Render Each Simulated Cluster
+      simulatedClusters.forEach(c => {
+        const approved = approvedList.includes(c.id);
+        const card = document.createElement('div');
+        card.id = `cluster-side-card-${c.id}`;
+        card.className = `p-2.5 rounded border ${approved ? 'border-emerald-600 bg-emerald-950/30' : 'border-slate-800 bg-slate-900/60'} hover:border-amber-400 cursor-pointer transition-all text-xs`;
+        card.style.borderLeft = `4px solid ${approved ? '#10b981' : (c.color || '#ef4444')}`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-1">
+            <div>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${approved ? 'bg-emerald-900 text-emerald-200 border border-emerald-500' : 'bg-amber-950 text-amber-300 border border-amber-600'}">
+                  ${approved ? '✅ APPROVED' : 'SIMULATED BLOCK'}
+                </span>
+                <b class="text-xs font-mono text-white">${c.id}</b>
+                <span class="text-[9px] font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-800 px-1 rounded">
+                  Span: ${c.max_span_km} km &le; ${c.limit_km} km
+                </span>
+              </div>
+              <p class="text-xs font-semibold text-slate-200 mt-1">${c.name}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">${c.corridor_name || c.corridor_id} &bull; <b class="text-sky-300">${c.window}</b></p>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded shadow ${approved ? 'bg-emerald-900 text-emerald-300' : 'bg-slate-800 text-slate-200 border border-slate-700'}">
+                ${c.duration_min} min
+              </span>
+              <div class="text-[9px] text-amber-400 font-semibold mt-1">Saved: ${c.time_saved_min}m</div>
+            </div>
+          </div>
+
+          <div class="mt-2 space-y-1 bg-slate-950/60 p-1.5 rounded border border-slate-800 text-[10px] text-slate-300">
+            ${c.tasks.map(t => `
+              <div class="flex items-center justify-between">
+                <span><b>${t.code} (${t.dept}):</b> ${t.fault_type}</span>
+                <span class="text-slate-400 font-mono">${t.nearest_station}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="mt-2 flex items-center justify-between text-[10px] border-t border-slate-800/80 pt-1.5">
+            <button onclick="toggleClusterApproval('${c.id}'); event.stopPropagation();" class="px-2 py-0.5 rounded font-bold ${approved ? 'bg-red-950 text-red-300 border border-red-700 hover:bg-red-900' : 'bg-emerald-950 text-emerald-300 border border-emerald-700 hover:bg-emerald-900'}">
+              ${approved ? 'Revoke' : 'Approve Block'}
+            </button>
+            <div class="flex items-center gap-2">
+              <a href="/index.html?cluster=${c.id}" class="text-amber-400 hover:underline font-bold" onclick="event.stopPropagation()">Inspect in Planner &rarr;</a>
+              <button onclick="previewCluster('${c.id}'); event.stopPropagation();" class="text-sky-400 hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer">Focus &rarr;</button>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          previewCluster(c.id);
+        });
+
+        container.appendChild(card);
+      });
+
+      // 3. Render Standalone Excluded Tasks Section
+      if (excludedTasks.length > 0) {
+        const exHeader = document.createElement('div');
+        exHeader.className = 'text-[11px] font-bold text-rose-400 uppercase tracking-wider px-1 pt-3 border-t border-slate-800 flex items-center justify-between';
+        exHeader.innerHTML = `<span>🚫 Standalone Tasks (&gt; ${currentClusterMaxKm} km Limit)</span> <span class="bg-rose-950 text-rose-300 border border-rose-800 px-1.5 py-0.2 rounded font-mono">${excludedTasks.length}</span>`;
+        container.appendChild(exHeader);
+
+        excludedTasks.forEach(u => {
+          const exCard = document.createElement('div');
+          exCard.className = 'p-2 rounded border border-slate-800 bg-slate-900/40 text-[11px] space-y-1';
+          exCard.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-bold bg-slate-800 text-rose-300 border border-rose-900 px-1 rounded">ISOLATED WORK</span>
+                <b class="text-white font-mono">${u.code}</b>
+                <span class="text-slate-400 text-[10px]">(${u.dept})</span>
+              </div>
+              <span class="text-[10px] text-amber-300 font-mono">${u.duration_min} min</span>
+            </div>
+            <div class="text-slate-300 text-[10px]">${u.fault_type} &bull; <b class="text-slate-400">${u.nearest_station}</b></div>
+            <div class="text-[9px] text-rose-400/90 font-mono">${u.reason}</div>
+          `;
+          container.appendChild(exCard);
+        });
+      }
+    }
+
+    function previewCluster(clusterId) {
+      const c = simulatedClusters.find(item => item.id === clusterId);
+      if (!c) return;
+
+      map.fitBounds(c.bounds, { padding: [60, 60] });
+
+      // If user asks to preview this cluster, render it temporarily
+      renderClustersOnMap();
+      setTimeout(() => {
+        if (clusterLayers[clusterId] && clusterLayers[clusterId].marker) {
+          clusterLayers[clusterId].marker.openPopup();
+        }
+      }, 750);
+      showToast(`Inspecting Simulated Mega-Block ${c.id}: Span ${c.max_span_km} km (Limit: ${c.limit_km} km)`);
+    }
+
+    function focusClusterOnMap(clusterId) {
+      previewCluster(clusterId);
+    }
+
+    function updateClusterApprovalUI() {
+      if (showClusterHighlights) {
+        renderClustersOnMap();
+      }
+      renderClustersList();
+    }
+
+    // Storage event listener for cross-tab realtime sync with index.html
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY_APPROVED_BLOCKS) {
+        updateClusterApprovalUI();
+      }
+    });
+
+    // Unified Sidebar Tab Switching
+    function switchSidebarTab(tab) {
+      const btnFaults = document.getElementById('tab-faults-btn');
+      const btnClusters = document.getElementById('tab-clusters-btn');
+      const btnTrains = document.getElementById('tab-trains-btn');
+      const btnCorridors = document.getElementById('tab-corridors-btn');
+
+      const contFaults = document.getElementById('faults-list-container');
+      const contClusters = document.getElementById('clusters-list-container');
+      const contTrains = document.getElementById('trains-list-container');
+      const contCorridors = document.getElementById('corridors-list-container');
+      const faultFilterBar = document.getElementById('fault-filter-bar');
+
+      [btnFaults, btnClusters, btnTrains, btnCorridors].forEach(b => {
+        if (b) b.className = 'flex-1 py-2 text-center text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center gap-1 transition-colors';
+      });
+
+      if (contFaults) contFaults.classList.add('hidden');
+      if (contClusters) contClusters.classList.add('hidden');
+      if (contTrains) contTrains.classList.add('hidden');
+      if (contCorridors) contCorridors.classList.add('hidden');
+      if (faultFilterBar) faultFilterBar.classList.add('hidden');
+
+      if (tab === 'faults') {
+        if (btnFaults) btnFaults.className = 'flex-1 py-2 text-center border-b-2 border-red-500 text-red-400 bg-slate-950 flex items-center justify-center gap-1 transition-colors';
+        if (contFaults) contFaults.classList.remove('hidden');
+        if (faultFilterBar) faultFilterBar.classList.remove('hidden');
+      } else if (tab === 'clusters') {
+        if (btnClusters) btnClusters.className = 'flex-1 py-2 text-center border-b-2 border-purple-500 text-purple-400 bg-slate-950 flex items-center justify-center gap-1 transition-colors';
+        if (contClusters) contClusters.classList.remove('hidden');
+      } else if (tab === 'trains') {
+        if (btnTrains) btnTrains.className = 'flex-1 py-2 text-center border-b-2 border-cyan-500 text-cyan-400 bg-slate-950 flex items-center justify-center gap-1 transition-colors';
+        if (contTrains) contTrains.classList.remove('hidden');
+      } else if (tab === 'corridors') {
+        if (btnCorridors) btnCorridors.className = 'flex-1 py-2 text-center border-b-2 border-amber-400 text-amber-300 bg-slate-950 flex items-center justify-center gap-1 transition-colors';
+        if (contCorridors) contCorridors.classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('tab-faults-btn').addEventListener('click', () => switchSidebarTab('faults'));
+    document.getElementById('tab-clusters-btn').addEventListener('click', () => switchSidebarTab('clusters'));
+    document.getElementById('tab-trains-btn').addEventListener('click', () => switchSidebarTab('trains'));
+    document.getElementById('tab-corridors-btn').addEventListener('click', () => switchSidebarTab('corridors'));
+
+    // 6. TOGGLE BUTTON: All Stations vs Operational Corridors Only
+    let isAllStationsView = false; // Default: clean operational corridors view
+
+    const btnOpStations = document.getElementById('toggle-operational-stations-btn');
+    const btnAllStations = document.getElementById('toggle-all-stations-btn');
+
+    btnOpStations.addEventListener('click', () => {
+      if (!isAllStationsView) return;
+      isAllStationsView = false;
+      btnOpStations.className = 'px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white shadow transition-all flex items-center gap-1';
+      btnAllStations.className = 'px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-1';
+      
+      map.removeLayer(allIndiaLayerGroup);
+      map.addLayer(operationalStationsLayerGroup);
+      showToast('Filtered: Showing only Howrah-Barddhaman & Sealdah Operational Stations');
+    });
+
+    btnAllStations.addEventListener('click', () => {
+      if (isAllStationsView) return;
+      isAllStationsView = true;
+      btnAllStations.className = 'px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white shadow transition-all flex items-center gap-1';
+      btnOpStations.className = 'px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-1';
+      
+      map.addLayer(allIndiaLayerGroup);
+      showToast('All India Stations Grid Enabled (8,697 stations)');
+    });
+
+    // 7. Load 8,697 Stations Dataset for Canvas Layer & Autocomplete Search
+    async function loadAllStations() {
+      try {
+        const res = await fetch('/api/stations');
+        allStationsData = await res.json();
+
+        // Populate canvas layer
+        allIndiaLayerGroup.clearLayers();
+        allStationsData.forEach(stn => {
+          const marker = L.circleMarker([stn.lat, stn.lng], {
+            renderer: stationCanvasRenderer,
+            radius: 2.5,
+            color: '#38bdf8',
+            fillColor: '#0284c7',
+            fillOpacity: 0.65,
+            weight: 0.8
+          });
+
+          marker.bindTooltip(`<strong>${stn.name} (${stn.code})</strong><br><span style="color:#94a3b8">${stn.state || ''} [${stn.zone || ''}]</span>`, {
+            direction: 'top',
+            offset: [0, -3]
+          });
+
+          marker.bindPopup(`
+            <div style="font-size:12px; line-height:1.5; min-width:180px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:4px; margin-bottom:4px;">
+                <b style="color:#38bdf8; font-size:13px;">${stn.name}</b>
+                <span style="background:#0284c7; color:#fff; font-size:9px; font-weight:bold; padding:1px 5px; border-radius:3px;">${stn.code}</span>
+              </div>
+              <div><b>State:</b> ${stn.state || 'N/A'}</div>
+              <div><b>Zone:</b> ${stn.zone || 'IR'}</div>
+              <div><b>GPS:</b> ${stn.lat.toFixed(4)} N, ${stn.lng.toFixed(4)} E</div>
+              <div style="margin-top:6px;">
+                <button onclick="map.setView([${stn.lat}, ${stn.lng}], 14)" style="background:#2563eb; color:#fff; border:none; padding:3px 8px; border-radius:3px; font-size:11px; cursor:pointer;">
+                  Zoom to Station
+                </button>
+              </div>
+            </div>
+          `);
+
+          marker.addTo(allIndiaLayerGroup);
+        });
+
+      } catch (e) {
+        console.warn("Couldn't load all stations:", e);
+      }
+    }
+
+    const searchInput = document.getElementById('station-search');
+    const resultsBox = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if (q.length < 2) {
+        resultsBox.classList.add('hidden');
+        return;
+      }
+
+      const matches = allStationsData.filter(s => 
+        s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+      ).slice(0, 8);
+
+      if (matches.length === 0) {
+        resultsBox.innerHTML = '<div class="p-2 text-slate-400 text-center">No stations found</div>';
+      } else {
+        resultsBox.innerHTML = matches.map(s => `
+          <div class="p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800 flex items-center justify-between" onclick="flyToStation(${s.lat}, ${s.lng}, '${s.name.replace(/'/g, "\\'")}', '${s.code}')">
+            <div>
+              <b class="text-white">${s.name}</b>
+              <span class="text-[10px] text-slate-400 ml-1">(${s.state || s.zone})</span>
+            </div>
+            <span class="bg-blue-900 text-blue-200 font-mono font-bold px-1.5 py-0.5 rounded text-[10px]">${s.code}</span>
+          </div>
+        `).join('');
+      }
+      resultsBox.classList.remove('hidden');
+    });
+
+    function flyToStation(lat, lng, name, code) {
+      resultsBox.classList.add('hidden');
+      searchInput.value = `${name} (${code})`;
+      map.flyTo([lat, lng], 13, { duration: 1.5 });
+      L.popup()
+        .setLatLng([lat, lng])
+        .setContent(`
+          <div style="font-size:12px; line-height:1.5;">
+            <b style="color:#38bdf8; font-size:13px;">${name} (${code})</b><br>
+            Coordinates: ${lat}, ${lng}
+          </div>
+        `)
+        .openOn(map);
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+        resultsBox.classList.add('hidden');
+      }
+    });
+
+    // Handle incoming URL parameters from Strategic Planner (?fault=, ?cluster=, ?category=)
+    function handleUrlParameters() {
+      const params = new URLSearchParams(window.location.search);
+      const targetCategory = params.get('category');
+      const targetFault = params.get('fault');
+      const targetCluster = params.get('cluster');
+
+      if (targetCategory && ['Track', 'Traction', 'Signal'].includes(targetCategory)) {
+        filterFaultCategory(targetCategory);
+      }
+
+      if (targetFault) {
+        setTimeout(() => {
+          focusFaultOnMap(targetFault);
+        }, 600);
+      } else if (targetCluster) {
+        setTimeout(() => {
+          focusClusterOnMap(targetCluster);
+        }, 600);
+      }
+    }
+
+    // Initialize Everything
+    async function start() {
+      await loadCorridorNetwork();
+      await loadFaults();
+      // Fetch simulated clusters from backend DSS with 15km limit (highlights remain OFF by default)
+      await fetchSimulatedMegaBlocks(15.0);
+      initTrainMarkers();
+      requestAnimationFrame(animateSimulation);
+      loadAllStations();
+      handleUrlParameters();
+      // Attempt to load real train data from RailRadar cache (non-blocking)
+      initRealTrainSim();
+    }
+    start();
+  </script>
+</body>
+</html>

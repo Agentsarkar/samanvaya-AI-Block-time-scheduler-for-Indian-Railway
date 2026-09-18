@@ -1,0 +1,478 @@
+train_number,train_name,train_type,corridor_id,source_code,dest_code,run_days,corridor_stops,train_gap_coverage_potential
+13009,Doon Express,MAIL EXPRESS,bly_bwn_asn_trunk,BLY,ASN,"mon,tue,wed,thu,fri,sat,sun",BLY(20:34/20:34) -> BWN(22:15/22:17) -> ASN(23:51/23:56),55 mins
+13010,Doon Express,MAIL EXPRESS,bly_bwn_asn_trunk,ASN,BLY,"mon,tue,wed,thu,fri,sat,sun",ASN(02:28/02:33) -> BWN(04:23/04:25) -> BLY(06:32/06:32),50 mins
+13019,Bagh Express,MAIL EXPRESS,bly_bwn_asn_trunk,BLY,ASN,"mon,tue,wed,thu,fri,sat,sun",BLY(21:49/21:49) -> BWN(23:21/23:23) -> ASN(01:11/01:16),43 mins
+13020,Bagh Express,MAIL EXPRESS,bly_bwn_asn_trunk,ASN,BLY,"mon,tue,wed,thu,fri,sat,sun",ASN(05:24/05:34) -> BWN(08:03/08:05) -> BLY(11:00/11:00),70 mins
+13021,Mithila Express,MAIL EXPRESS,bly_bwn_asn_trunk,BLY,ASN,"mon,tue,wed,thu,fri,sat,sun",BLY(15:58/15:58) -> BWN(18:08/18:10) -> ASN(19:53/19:58),41 mins
+13022,Mithila Express,MAIL EXPRESS,bly_bwn_asn_trunk,ASN,BLY,"mon,tue,wed,thu,fri,sat,sun",ASN(23:05/23:15) -> BWN(01:25/01:27) -> BLY(03:28/03:28),48 mins
+13029,Howrah - Mokama Express,MAIL EXPRESS,bly_bwn_asn_trunk,BLY,ASN,"mon,tue,wed,thu,fri,sat,sun",BLY(23:28/23:28) -> BWN(01:28/01:30) -> ASN(03:26/03:36),46 mins
+13030,Mokama - Howrah Express,MAIL EXPRESS,bly_bwn_asn_trunk,ASN,BLY,"mon,tue,wed,thu,fri,sat,sun",ASN(21:05/21:25) -> BWN(00:37/00:39) -> BLY(02:38/02:39),47 mins
+13043,Howrah - Raxaul Express,MAIL EXPRESS,bly_bwn_asn_trunk,BLY,ASN,"wed,fri",BLY(23:10/23:10) -> BWN(01:04/01:06) -> ASN(02:26/02:31),32 mins
+13044,Raxaul - Howrah Express,MAIL EXPRESS,bly_bwn_asn_trunk,ASN,BLY,"thu,sat",ASN(07:48/07:58) -> BWN(09:51/09:53) -> BLY(11:57/11:57),49 mins
+13065,Howrah - Anand Vihar Terminal Amrit Bharat Express,Amrit Bharat Express,bly_bwn_asn_trunk,BLY,ASN,thu,BLY(23:21/23:21) -> BWN(01:04/01:06) -> ASN(02:26/02:28),32 mins
+13066,Anand Vihar Terminal - Howrah Amrit Bharat Express,Amrit Bharat Express,bly_bwn_asn_trunk,ASN,BLY,sat,ASN(06:20/06:22) -> BWN(07:53/07:55) -> BLY(10:28/10:28),61 mins
+22387,Black Diamond Express,SUPERFAST,bly_bwn_asn_trunk,BLY,ASN,"mon,tue,wed,thu,fri,sat,sun",BLY(06:24/06:24) -> BWN(07:48/07:50) -> ASN(09:31/09:34),40 mins
+22388,Black Diamond Express,SUPERFAST,bly_bwn_asn_trunk,ASN,BLY,"mon,tue,wed,thu,fri,sat,sun",ASN(17:24/17:27) -> BWN(19:13/19:15) -> BLY(21:09/21:09),45 mins
+11447,Shaktipunj Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(19:16/19:21) -> BWN(21:03/21:05) -> HWH(22:45/--),40 mins
+11448,Shaktipunj Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/13:10) -> BWN(14:07/14:09) -> ASN(15:35/15:40),34 mins
+12019,Howrah - Ranchi Shatabdi Express,Shatabdi Express,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat",HWH(--/06:05) -> BWN(07:00/07:00) -> ASN(08:12/08:14),28 mins
+12020,Ranchi - Howrah Shatabdi Express,Shatabdi Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat",ASN(18:27/18:29) -> BWN(20:01/20:01) -> HWH(21:20/--),31 mins
+12023,Howrah - Patna Shatabdi Express,Shatabdi Express,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat",HWH(--/14:05) -> BWN(15:03/15:03) -> ASN(16:21/16:30),31 mins
+12024,Patna - Howrah Shatabdi Express,Shatabdi Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat",ASN(10:30/10:35) -> BWN(12:01/12:01) -> HWH(13:25/--),33 mins
+12175,Chambal Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"wed,sun",HWH(--/17:45) -> BWN(18:55/18:57) -> ASN(20:25/20:30),35 mins
+12176,Chambal Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"tue,sat",ASN(03:38/03:43) -> BWN(05:12/05:14) -> HWH(06:55/--),40 mins
+12177,Chambal Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,fri,HWH(--/17:45) -> BWN(18:55/18:57) -> ASN(20:25/20:30),35 mins
+12178,Chambal Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,mon,ASN(03:38/03:43) -> BWN(05:12/05:14) -> HWH(06:55/--),40 mins
+12259,Sealdah - Bikaner AC Duronto Express,Duronto Express,hwh_bwn_asn_line,HWH,ASN,"mon,wed,thu,sun",HWH(17:03/17:03) -> BWN(18:18/18:18) -> ASN(19:43/19:43),34 mins
+12260,Bikaner - Sealdah AC Duronto Express,Duronto Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,thu,fri",ASN(10:13/10:13) -> BWN(11:56/11:56) -> HWH(13:27/13:27),36 mins
+12273,Howrah - New Delhi Duronto Express,Duronto Express,hwh_bwn_asn_line,HWH,ASN,"mon,fri",HWH(--/08:45) -> BWN(09:44/09:44) -> ASN(10:50/10:55),26 mins
+12274,New Delhi - Howrah Duronto Express,Duronto Express,hwh_bwn_asn_line,ASN,HWH,"tue,sat",ASN(07:26/07:31) -> BWN(09:08/09:08) -> HWH(10:35/--),34 mins
+12301,Howrah - New Delhi Rajdhani Express,Rajdhani Express,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat",HWH(--/16:50) -> BWN(17:45/17:45) -> ASN(18:47/18:49),24 mins
+12302,New Delhi - Howrah Rajdhani Express,Rajdhani Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,sat,sun",ASN(07:18/07:20) -> BWN(08:42/08:42) -> HWH(09:55/--),29 mins
+12303,Poorva Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,fri,sat",HWH(--/08:00) -> BWN(08:55/08:57) -> ASN(10:21/10:26),33 mins
+12304,Poorva Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"wed,thu,sat,sun",ASN(13:16/13:26) -> BWN(15:03/15:05) -> HWH(17:00/--),46 mins
+12305,Howrah - New Delhi Rajdhani Express,Rajdhani Express,hwh_bwn_asn_line,HWH,ASN,sun,HWH(--/14:05) -> BWN(14:57/14:59) -> ASN(16:08/16:08),27 mins
+12306,New Delhi - Howrah Rajdhani Express,Rajdhani Express,hwh_bwn_asn_line,ASN,HWH,fri,ASN(09:11/09:11) -> BWN(10:35/10:37) -> HWH(12:15/--),39 mins
+12307,Jodhpur Superfast Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"tue,wed,sat,sun",HWH(--/23:30) -> BWN(00:22/00:24) -> ASN(01:55/01:59),36 mins
+12308,Howrah Superfast Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,thu,fri",ASN(01:29/01:34) -> BWN(03:00/03:02) -> HWH(04:55/--),45 mins
+12313,Sealdah - New Delhi Rajdhani Express,Rajdhani Express,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(16:52/16:52) -> BWN(17:55/17:55) -> ASN(19:06/19:10),28 mins
+12314,New Delhi - Sealdah Rajdhani Express,Rajdhani Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(07:01/07:03) -> BWN(08:35/08:35) -> HWH(10:07/10:07),36 mins
+12321,Mumbai Mail,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/23:40) -> BWN(00:32/00:34) -> ASN(02:10/02:15),38 mins
+12322,Howrah Mail,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(07:26/07:36) -> BWN(09:28/09:30) -> HWH(11:10/--),40 mins
+12323,Barmer SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"tue,fri",HWH(--/18:50) -> BWN(19:55/19:55) -> ASN(21:08/21:13),29 mins
+12324,Howrah SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"wed,sat",ASN(02:11/02:16) -> BWN(04:07/04:07) -> HWH(05:45/--),39 mins
+12329,West Bengal Sampark Kranti Express,Mail/Express,hwh_bwn_asn_line,HWH,ASN,tue,HWH(13:13/13:13) -> BWN(14:29/14:31) -> ASN(15:52/15:57),32 mins
+12330,West Bengal Sampark Kranti Express,Mail/Express,hwh_bwn_asn_line,ASN,HWH,wed,ASN(12:43/12:53) -> BWN(14:23/14:25) -> HWH(16:31/16:31),50 mins
+12339,Coalfield Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:20) -> BWN(18:29/18:29) -> ASN(20:04/20:07),38 mins
+12340,Coalfield Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(06:50/06:53) -> BWN(08:46/08:46) -> HWH(10:25/--),39 mins
+12341,Agnibina Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:20) -> BWN(19:17/19:19) -> ASN(21:30/--),52 mins
+12342,Agnibina Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(--/05:30) -> BWN(07:05/07:07) -> HWH(09:00/--),45 mins
+12351,Rajendra Nagar Terminal SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:35) -> BWN(21:32/21:34) -> ASN(23:00/23:05),34 mins
+12352,Howrah SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(03:15/03:20) -> BWN(04:54/04:56) -> HWH(06:40/--),41 mins
+12353,Lal Kuan Weekly SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,fri,HWH(--/08:15) -> BWN(09:08/09:10) -> ASN(10:33/10:38),33 mins
+12354,Howrah Weekly SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,sat,ASN(15:01/15:06) -> BWN(16:34/16:36) -> HWH(18:25/--),43 mins
+12371,Bikaner Weekly SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,mon,HWH(--/08:15) -> BWN(09:18/09:18) -> ASN(10:33/10:38),30 mins
+12372,Howrah Weekly SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,thu,ASN(12:57/13:07) -> BWN(14:55/14:55) -> HWH(16:50/--),46 mins
+12379,Amritsar Jallianwala Bagh Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,fri,HWH(13:13/13:13) -> BWN(14:29/14:31) -> ASN(15:52/15:57),32 mins
+12380,Sealdah Jallianwala Bagh Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,sun,ASN(12:43/12:53) -> BWN(14:23/14:25) -> HWH(16:31/16:31),50 mins
+12381,Poorva Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"wed,thu,sun",HWH(--/08:15) -> BWN(09:07/09:09) -> ASN(10:33/10:38),33 mins
+12382,Poorva Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,fri",ASN(13:16/13:26) -> BWN(15:03/15:05) -> HWH(17:00/--),46 mins
+12937,Garba SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,sat,ASN(09:39/09:49) -> BWN(11:27/11:27) -> HWH(12:55/--),35 mins
+12938,Garba SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,mon,HWH(--/23:00) -> BWN(00:04/00:04) -> ASN(01:16/01:26),28 mins
+12987,Ajmer SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(22:57/22:57) -> BWN(00:08/00:10) -> ASN(01:37/01:40),34 mins
+12988,Sealdah SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(11:51/11:54) -> BWN(13:39/13:41) -> HWH(15:46/15:46),50 mins
+13005,Amritsar Mail,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:20) -> BWN(20:12/20:14) -> ASN(21:41/21:46),34 mins
+13006,Howrah Mail,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(03:48/03:53) -> BWN(05:35/05:37) -> HWH(07:25/--),43 mins
+13009,Doon Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:25) -> BWN(22:15/22:17) -> ASN(23:51/23:56),55 mins
+13010,Doon Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(02:28/02:33) -> BWN(04:23/04:25) -> HWH(07:00/--),62 mins
+13019,Bagh Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:40) -> BWN(23:21/23:23) -> ASN(01:11/01:16),43 mins
+13020,Bagh Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(05:24/05:34) -> BWN(08:03/08:05) -> HWH(11:15/--),76 mins
+13021,Mithila Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:50) -> BWN(18:08/18:10) -> ASN(19:53/19:58),41 mins
+13022,Mithila Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(23:05/23:15) -> BWN(01:25/01:27) -> HWH(04:00/--),61 mins
+13025,Bhopal Weekly Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,mon,HWH(--/12:35) -> BWN(13:27/13:29) -> ASN(14:54/14:59),34 mins
+13026,Howrah Weekly Express,Mail/Express,hwh_bwn_asn_line,ASN,HWH,wed,ASN(11:35/11:45) -> BWN(13:27/13:29) -> HWH(15:10/--),40 mins
+13029,Howrah - Mokama Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/23:20) -> BWN(01:28/01:30) -> ASN(03:26/03:36),46 mins
+13030,Mokama - Howrah Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(21:05/21:25) -> BWN(00:37/00:39) -> HWH(03:25/--),66 mins
+13035,Upasana Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"tue,fri",HWH(--/13:00) -> BWN(14:06/14:06) -> ASN(15:19/15:24),29 mins
+13036,Upasana Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"wed,sat",ASN(23:35/23:40) -> BWN(01:34/01:34) -> HWH(03:15/--),40 mins
+13037,Kumbh Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,wed,thu,sat,sun",HWH(--/13:00) -> BWN(14:06/14:06) -> ASN(15:19/15:24),29 mins
+13038,Kumbh Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,thu,fri,sun",ASN(23:35/23:40) -> BWN(01:34/01:34) -> HWH(03:15/--),40 mins
+13041,Himgiri Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"tue,fri,sat",HWH(--/23:55) -> BWN(01:02/01:02) -> ASN(02:18/02:23),30 mins
+13042,Himgiri Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,thu,sun",ASN(07:48/07:58) -> BWN(09:50/09:50) -> HWH(11:30/--),40 mins
+13043,Howrah - Raxaul Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"wed,fri",HWH(--/23:00) -> BWN(01:04/01:06) -> ASN(02:26/02:31),32 mins
+13044,Raxaul - Howrah Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"thu,sat",ASN(07:48/07:58) -> BWN(09:51/09:53) -> HWH(12:15/--),56 mins
+13047,Vibhuti Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:55) -> BWN(20:52/20:54) -> ASN(22:27/22:32),37 mins
+13048,Vibhuti Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(04:02/04:07) -> BWN(05:46/05:48) -> HWH(07:35/--),42 mins
+13051,Netaji Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:55) -> BWN(22:53/22:55) -> ASN(00:22/00:27),34 mins
+13052,Netaji Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(04:16/04:21) -> BWN(06:14/06:16) -> HWH(08:05/--),43 mins
+13065,Howrah - Anand Vihar Terminal Amrit Bharat Express,Amrit Bharat Express,hwh_bwn_asn_line,HWH,ASN,thu,HWH(--/23:10) -> BWN(01:04/01:06) -> ASN(02:26/02:28),32 mins
+13066,Anand Vihar Terminal - Howrah Amrit Bharat Express,Amrit Bharat Express,hwh_bwn_asn_line,ASN,HWH,sat,ASN(06:20/06:22) -> BWN(07:53/07:55) -> HWH(10:50/--),70 mins
+15235,Darbhanga Weekly Express,MAIL EXPRESS,hwh_bwn_asn_line,HWH,ASN,sat,HWH(--/11:15) -> BWN(12:08/12:10) -> ASN(13:54/13:59),41 mins
+15236,Howrah Weekly Express,MAIL EXPRESS,hwh_bwn_asn_line,ASN,HWH,fri,ASN(22:53/22:58) -> BWN(00:59/01:01) -> HWH(03:05/--),49 mins
+15271,Muzaffarpur Jan Sadharan Express,Mail/Express,hwh_bwn_asn_line,HWH,ASN,wed,HWH(--/11:15) -> BWN(12:08/12:10) -> ASN(13:49/13:59),39 mins
+15272,Howrah Jan Sadharan Express,Mail/Express,hwh_bwn_asn_line,ASN,HWH,tue,ASN(22:48/22:58) -> BWN(00:59/01:01) -> HWH(03:05/--),49 mins
+20975,Chambal Express,Superfast Express,hwh_bwn_asn_line,HWH,ASN,tue,HWH(--/17:45) -> BWN(18:55/18:57) -> ASN(20:25/20:30),35 mins
+20976,Chambal Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,thu,ASN(03:38/03:43) -> BWN(05:12/05:14) -> HWH(06:55/--),40 mins
+22303,Howrah - Gaya Vande Bharat Express,Vande Bharat Express,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,fri,sat,sun",HWH(--/06:45) -> BWN(07:35/07:35) -> ASN(08:33/08:35),23 mins
+22304,Gaya - Howrah Vande Bharat Express,Vande Bharat Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,fri,sat,sun",ASN(18:38/18:40) -> BWN(19:54/19:54) -> HWH(21:10/--),30 mins
+22307,Bikaner SF Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,thu,fri",HWH(--/23:30) -> BWN(00:22/00:24) -> ASN(01:55/01:59),36 mins
+22308,Howrah SF Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"wed,sat,sun",ASN(01:29/01:34) -> BWN(03:00/03:02) -> HWH(04:55/--),45 mins
+22317,Sealdah - Jammu Tawi Humsafar Express,Humsafar Express,hwh_bwn_asn_line,HWH,ASN,mon,HWH(13:13/13:13) -> BWN(14:29/14:29) -> ASN(15:55/15:57),34 mins
+22318,Jammu Tawi - Sealdah Humsafar Express,Humsafar Express,hwh_bwn_asn_line,ASN,HWH,wed,ASN(13:33/13:35) -> BWN(15:37/15:37) -> HWH(17:26/17:26),43 mins
+22347,Howrah - Patna Vande Bharat Express,Vande Bharat Express,hwh_bwn_asn_line,HWH,ASN,"mon,tue,thu,fri,sat,sun",HWH(--/15:50) -> BWN(16:42/16:42) -> ASN(17:44/17:47),24 mins
+22348,Patna - Howrah Vande Bharat Express,Vande Bharat Express,hwh_bwn_asn_line,ASN,HWH,"mon,tue,thu,fri,sat,sun",ASN(11:55/11:58) -> BWN(13:16/13:16) -> HWH(14:35/--),31 mins
+22387,Black Diamond Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:15) -> BWN(07:48/07:50) -> ASN(09:31/09:34),40 mins
+22388,Black Diamond Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"mon,tue,wed,thu,fri,sat,sun",ASN(17:24/17:27) -> BWN(19:13/19:15) -> HWH(21:30/--),54 mins
+22587,Sealdah - Banaras Amrit Bharat Express,Amrit Bharat Express,hwh_bwn_asn_line,HWH,ASN,"mon,wed,sat",HWH(19:32/19:32) -> BWN(20:36/20:36) -> ASN(21:42/21:45),26 mins
+22588,Banaras - Sealdah Amrit Bharat Express,Amrit Bharat Express,hwh_bwn_asn_line,ASN,HWH,"tue,fri,sun",ASN(06:17/06:20) -> BWN(08:00/08:00) -> HWH(09:51/09:51),44 mins
+22911,Shipra Express,SUPERFAST,hwh_bwn_asn_line,ASN,HWH,"tue,thu,sat",ASN(03:38/03:43) -> BWN(05:12/05:14) -> HWH(06:55/--),40 mins
+22912,Shipra Express,SUPERFAST,hwh_bwn_asn_line,HWH,ASN,"mon,thu,sat",HWH(--/17:45) -> BWN(18:55/18:57) -> ASN(20:25/20:30),35 mins
+13009,Doon Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:25) -> BDC(21:18/21:23) -> BWN(22:15/22:17),55 mins
+13010,Doon Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(04:23/04:25) -> BDC(05:22/05:27) -> HWH(07:00/--),37 mins
+13011,Malda Town Intercity Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:25) -> BDC(16:12/16:14) -> BWN(17:12/17:14),23 mins
+13012,Howrah Intercity Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(09:00/09:02) -> BDC(10:13/10:15) -> HWH(11:25/--),28 mins
+13015,Jamalpur Kavi Guru Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/10:55) -> BDC(11:40/11:42) -> BWN(12:43/12:45),24 mins
+13016,Howrah Kavi Guru Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(14:12/14:14) -> BDC(15:12/15:14) -> HWH(16:30/--),30 mins
+13017,Ganadevta Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:05) -> BDC(06:47/06:49) -> BWN(07:35/07:37),18 mins
+13018,Ganadevta Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(19:26/19:28) -> BDC(20:36/20:38) -> HWH(21:50/--),28 mins
+13019,Bagh Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:40) -> BDC(22:35/22:37) -> BWN(23:21/23:23),17 mins
+13020,Bagh Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(08:03/08:05) -> BDC(10:00/10:04) -> HWH(11:15/--),28 mins
+13021,Mithila Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:50) -> BDC(16:53/16:58) -> BWN(18:08/18:10),28 mins
+13022,Mithila Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(01:25/01:27) -> BDC(02:16/02:21) -> HWH(04:00/--),39 mins
+13023,Howrah - Gaya Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:00) -> BDC(20:43/20:45) -> BWN(21:28/21:30),17 mins
+13024,Gaya - Howrah Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(00:40/00:42) -> BDC(01:43/01:45) -> HWH(03:15/--),36 mins
+13027,Azimganj Kaviguru Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/22:40) -> BDC(23:21/23:23) -> BWN(00:13/00:15),20 mins
+13028,Howrah Kaviguru Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(11:27/11:29) -> BDC(12:40/12:42) -> HWH(13:55/--),29 mins
+13029,Howrah - Mokama Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/23:20) -> BDC(00:16/00:21) -> BWN(01:28/01:30),26 mins
+13030,Mokama - Howrah Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(00:37/00:39) -> BDC(01:35/01:45) -> HWH(03:25/--),40 mins
+13031,Howrah - Jaynagar Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/11:25) -> BDC(12:18/12:22) -> BWN(13:31/13:33),27 mins
+13032,Jaynagar - Howrah Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(18:38/18:40) -> BDC(19:50/19:55) -> HWH(21:15/--),32 mins
+13043,Howrah - Raxaul Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"wed,fri",HWH(--/23:00) -> BDC(23:48/23:50) -> BWN(01:04/01:06),29 mins
+13044,Raxaul - Howrah Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"thu,sat",BWN(09:51/09:53) -> BDC(10:47/10:49) -> HWH(12:15/--),34 mins
+13045,Mayurakshi Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:25) -> BDC(17:04/17:06) -> BWN(18:23/18:25),30 mins
+13046,Mayurakshi Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(09:16/09:18) -> BDC(10:20/10:22) -> HWH(11:35/--),29 mins
+13053,Kulik Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/08:55) -> BDC(09:46/09:48) -> BWN(10:42/10:44),21 mins
+13054,Kulik Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(12:45/12:47) -> BDC(13:51/13:53) -> HWH(15:20/--),34 mins
+13065,Howrah - Anand Vihar Terminal Amrit Bharat Express,Amrit Bharat Express,hwh_bwn_main,HWH,BWN,thu,HWH(--/23:10) -> BDC(00:01/00:03) -> BWN(01:04/01:06),24 mins
+13066,Anand Vihar Terminal - Howrah Amrit Bharat Express,Amrit Bharat Express,hwh_bwn_main,BWN,HWH,sat,BWN(07:53/07:55) -> BDC(09:05/09:07) -> HWH(10:50/--),41 mins
+13427,Sahibganj Intercity Express,MAIL EXPRESS,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/13:45) -> BDC(14:30/14:32) -> BWN(15:40/15:42),27 mins
+13428,Howrah Intercity Express,MAIL EXPRESS,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(09:34/09:36) -> BDC(10:40/10:42) -> HWH(12:10/--),35 mins
+22321,Hool Express,SUPERFAST,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:55) -> BDC(07:34/07:35) -> BWN(08:19/08:21),17 mins
+22322,Hool Express,SUPERFAST,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(15:55/15:57) -> BDC(16:47/16:48) -> HWH(18:00/--),28 mins
+22387,Black Diamond Express,SUPERFAST,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:15) -> BDC(06:56/06:58) -> BWN(07:48/07:50),20 mins
+22388,Black Diamond Express,SUPERFAST,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(19:13/19:15) -> BDC(20:14/20:16) -> HWH(21:30/--),29 mins
+37811,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/04:15) -> BDC(05:15/05:17) -> BWN(06:35/--),31 mins
+37812,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/03:05) -> BDC(04:20/04:21) -> HWH(05:27/--),26 mins
+37813,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/05:00) -> BDC(05:59/06:01) -> BWN(07:20/--),31 mins
+37814,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/04:05) -> BDC(05:23/05:27) -> HWH(06:35/--),27 mins
+37815,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/05:15) -> BDC(06:16/06:17) -> BWN(07:36/--),31 mins
+37816,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/05:05) -> BDC(06:20/06:21) -> HWH(07:28/--),26 mins
+37817,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:20) -> BDC(07:17/07:18) -> BWN(08:45/--),34 mins
+37818,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/05:40) -> BDC(06:58/07:00) -> HWH(08:12/--),28 mins
+37819,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/07:00) -> BDC(07:59/08:01) -> BWN(09:20/--),31 mins
+37820,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/06:10) -> BDC(07:23/07:24) -> HWH(08:31/--),26 mins
+37821,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/08:05) -> BDC(09:05/09:07) -> BWN(10:20/--),29 mins
+37822,Barddhaman - Howrah Main Line Super Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/06:35) -> BDC(07:39/07:40) -> HWH(08:30/--),20 mins
+37823,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/09:00) -> BDC(10:00/10:02) -> BWN(11:25/--),33 mins
+37824,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/07:15) -> BDC(08:37/08:38) -> HWH(09:40/--),24 mins
+37825,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/10:05) -> BDC(11:08/11:10) -> BWN(12:30/--),32 mins
+37826,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/07:40) -> BDC(08:57/08:58) -> HWH(09:52/--),21 mins
+37827,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/11:30) -> BDC(12:31/12:33) -> BWN(13:52/--),31 mins
+37828,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/08:20) -> BDC(09:36/09:37) -> HWH(10:40/--),25 mins
+37829,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/12:30) -> BDC(13:30/13:32) -> BWN(14:50/--),31 mins
+37830,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/08:50) -> BDC(10:09/10:10) -> HWH(11:10/--),24 mins
+37831,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/14:20) -> BDC(15:19/15:22) -> BWN(16:35/--),29 mins
+37832,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/09:55) -> BDC(11:35/11:37) -> HWH(12:40/--),25 mins
+37833,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,sat,HWH(--/14:52) -> BDC(15:55/15:56) -> BWN(17:10/--),29 mins
+37834,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/11:22) -> BDC(12:43/12:45) -> HWH(13:50/--),26 mins
+37835,Howrah - Barddhaman Galloping local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sun",HWH(--/14:55) -> BDC(15:55/15:56) -> BWN(17:11/--),30 mins
+37836,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/12:25) -> BDC(13:43/13:45) -> HWH(14:46/--),24 mins
+37837,Howrah - Barddhaman Galloping local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:40) -> BDC(16:35/16:37) -> BWN(17:55/--),31 mins
+37838,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/13:40) -> BDC(14:59/15:00) -> HWH(16:12/--),28 mins
+37839,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:45) -> BDC(17:40/17:42) -> BWN(19:02/--),32 mins
+37840,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/15:10) -> BDC(16:32/16:33) -> HWH(17:37/--),25 mins
+37841,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:35) -> BDC(18:28/18:30) -> BWN(19:46/--),30 mins
+37842,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/16:30) -> BDC(17:50/17:52) -> HWH(19:00/--),27 mins
+37843,Howrah - Barddhaman Main Line Super Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:55) -> BDC(18:43/18:44) -> BWN(19:56/--),28 mins
+37844,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sun",BWN(--/17:25) -> BDC(18:44/18:45) -> HWH(19:49/--),25 mins
+37845,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat",HWH(--/18:05) -> BDC(19:01/19:03) -> BWN(20:25/--),32 mins
+37846,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,sat,BWN(--/17:25) -> BDC(18:44/18:45) -> HWH(19:49/--),25 mins
+37847,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:35) -> BDC(19:31/19:32) -> BWN(20:53/--),32 mins
+37848,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/18:00) -> BDC(19:18/19:20) -> HWH(20:22/--),24 mins
+37849,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:00) -> BDC(19:51/19:52) -> BWN(21:02/--),28 mins
+37850,Barddhaman - Howrah Local via-Main Line,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/18:40) -> BDC(19:53/19:55) -> HWH(20:59/--),25 mins
+37851,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:10) -> BDC(20:10/20:11) -> BWN(21:25/--),29 mins
+37852,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/19:50) -> BDC(21:07/21:08) -> HWH(22:18/--),28 mins
+37853,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:20) -> BDC(21:33/21:34) -> BWN(22:55/--),32 mins
+37854,Barddhaman - Howrah Local,SUBURBAN,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/20:40) -> BDC(22:03/22:05) -> HWH(23:17/--),28 mins
+37855,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:52) -> BDC(21:55/21:57) -> BWN(23:15/--),31 mins
+37857,Howrah - Barddhaman Local,SUBURBAN,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/22:10) -> BDC(23:09/23:10) -> BWN(00:28/--),31 mins
+53047,Viswabharati Fast Passenger,PASSENGER,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:40) -> BDC(17:31/17:33) -> BWN(18:38/18:40),26 mins
+53048,Viswabharati Fast Passenger,PASSENGER,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(07:43/07:45) -> BDC(09:00/09:02) -> HWH(10:10/--),27 mins
+63501,Howrah - Barddhaman Fast MEMU,MEMU,hwh_bwn_main,HWH,BWN,"mon,tue,wed,thu,fri,sat,sun",HWH(--/01:30) -> BDC(02:10/02:12) -> BWN(03:20/--),27 mins
+63502,Barddhaman - Howrah MEMU,MEMU,hwh_bwn_main,BWN,HWH,"mon,tue,wed,thu,fri,sat,sun",BWN(--/21:58) -> BDC(23:10/23:11) -> HWH(00:15/--),25 mins
+11447,Shaktipunj Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(21:17/21:17) -> HWH(22:45/--),35 mins
+11448,Shaktipunj Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/13:10) -> SKG(14:00/14:00),20 mins
+12019,Howrah - Ranchi Shatabdi Express,Shatabdi Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat",HWH(--/06:05) -> SKG(06:54/06:54),19 mins
+12020,Ranchi - Howrah Shatabdi Express,Shatabdi Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat",SKG(20:10/20:10) -> HWH(21:20/--),28 mins
+12023,Howrah - Patna Shatabdi Express,Shatabdi Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat",HWH(--/14:05) -> SKG(14:56/14:56),20 mins
+12024,Patna - Howrah Shatabdi Express,Shatabdi Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat",SKG(12:11/12:11) -> HWH(13:25/--),29 mins
+12041,Howrah - New Jalpaiguri Shatabdi Express,Shatabdi Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat",HWH(--/14:25) -> SKG(15:11/15:11),18 mins
+12042,New Jalpaiguri - Howrah Shatabdi Express,Shatabdi Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat",SKG(12:19/12:19) -> HWH(13:45/--),34 mins
+12175,Chambal Express,SUPERFAST,hwh_skg_line,HWH,SKG,"wed,sun",HWH(--/17:45) -> SKG(18:46/18:46),24 mins
+12176,Chambal Express,SUPERFAST,hwh_skg_line,SKG,HWH,"tue,sat",SKG(05:26/05:26) -> HWH(06:55/--),35 mins
+12177,Chambal Express,SUPERFAST,hwh_skg_line,HWH,SKG,fri,HWH(--/17:45) -> SKG(18:46/18:46),24 mins
+12178,Chambal Express,SUPERFAST,hwh_skg_line,SKG,HWH,mon,SKG(05:26/05:26) -> HWH(06:55/--),35 mins
+12259,Sealdah - Bikaner AC Duronto Express,Duronto Express,hwh_skg_line,HWH,SKG,"mon,wed,thu,sun",HWH(17:03/17:03) -> SKG(18:09/18:09),26 mins
+12260,Bikaner - Sealdah AC Duronto Express,Duronto Express,hwh_skg_line,SKG,HWH,"mon,tue,thu,fri",SKG(12:07/12:07) -> HWH(13:27/13:27),32 mins
+12273,Howrah - New Delhi Duronto Express,Duronto Express,hwh_skg_line,HWH,SKG,"mon,fri",HWH(--/08:45) -> SKG(09:37/09:37),20 mins
+12274,New Delhi - Howrah Duronto Express,Duronto Express,hwh_skg_line,SKG,HWH,"tue,sat",SKG(09:19/09:19) -> HWH(10:35/--),30 mins
+12301,Howrah - New Delhi Rajdhani Express,Rajdhani Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat",HWH(--/16:50) -> SKG(17:38/17:38),19 mins
+12302,New Delhi - Howrah Rajdhani Express,Rajdhani Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,sat,sun",SKG(08:51/08:51) -> HWH(09:55/--),25 mins
+12303,Poorva Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,fri,sat",HWH(--/08:00) -> SKG(08:48/08:48),19 mins
+12304,Poorva Express,SUPERFAST,hwh_skg_line,SKG,HWH,"wed,thu,sat,sun",SKG(15:19/15:19) -> HWH(17:00/--),40 mins
+12305,Howrah - New Delhi Rajdhani Express,Rajdhani Express,hwh_skg_line,HWH,SKG,sun,HWH(--/14:05) -> SKG(14:51/14:51),18 mins
+12306,New Delhi - Howrah Rajdhani Express,Rajdhani Express,hwh_skg_line,SKG,HWH,fri,SKG(10:49/10:49) -> HWH(12:15/--),34 mins
+12307,Jodhpur Superfast Express,SUPERFAST,hwh_skg_line,HWH,SKG,"tue,wed,sat,sun",HWH(--/23:30) -> SKG(00:16/00:16),18 mins
+12308,Howrah Superfast Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,thu,fri",SKG(03:16/03:16) -> HWH(04:55/--),39 mins
+12313,Sealdah - New Delhi Rajdhani Express,Rajdhani Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(16:52/16:52) -> SKG(17:48/17:48),22 mins
+12314,New Delhi - Sealdah Rajdhani Express,Rajdhani Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(08:46/08:46) -> HWH(10:07/10:07),32 mins
+12321,Mumbai Mail,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/23:40) -> SKG(00:26/00:26),18 mins
+12322,Howrah Mail,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(09:42/09:42) -> HWH(11:10/--),35 mins
+12323,Barmer SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,"tue,fri",HWH(--/18:50) -> SKG(19:47/19:47),22 mins
+12324,Howrah SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,"wed,sat",SKG(04:19/04:19) -> HWH(05:45/--),34 mins
+12329,West Bengal Sampark Kranti Express,Mail/Express,hwh_skg_line,HWH,SKG,tue,HWH(13:13/13:13) -> SKG(14:20/14:20),26 mins
+12330,West Bengal Sampark Kranti Express,Mail/Express,hwh_skg_line,SKG,HWH,wed,SKG(14:40/14:40) -> HWH(16:31/16:31),44 mins
+12337,Shantiniketan Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/10:00) -> SKG(10:54/10:54),21 mins
+12338,Shantiniketan Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(14:20/14:20) -> HWH(16:00/--),40 mins
+12339,Coalfield Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:20) -> SKG(18:21/18:21),24 mins
+12340,Coalfield Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(08:58/08:58) -> HWH(10:25/--),34 mins
+12341,Agnibina Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:20) -> SKG(19:10/19:10),20 mins
+12342,Agnibina Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(07:21/07:21) -> HWH(09:00/--),39 mins
+12343,Darjeeling Mail,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(22:17/22:17) -> SKG(23:17/23:17),24 mins
+12344,Darjeeling Mail,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(03:08/03:08) -> HWH(05:29/05:29),56 mins
+12345,Saraighat Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:05) -> SKG(16:51/16:51),18 mins
+12346,Saraighat Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(03:43/03:43) -> HWH(05:20/--),38 mins
+12347,Sahid Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/12:15) -> SKG(13:09/13:09),21 mins
+12348,Sahid Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(18:31/18:31) -> HWH(20:15/--),41 mins
+12351,Rajendra Nagar Terminal SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:35) -> SKG(21:25/21:25),20 mins
+12352,Howrah SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(05:09/05:09) -> HWH(06:40/--),36 mins
+12353,Lal Kuan Weekly SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,fri,HWH(--/08:15) -> SKG(09:02/09:02),18 mins
+12354,Howrah Weekly SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,sat,SKG(16:49/16:49) -> HWH(18:25/--),38 mins
+12371,Bikaner Weekly SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,mon,HWH(--/08:15) -> SKG(09:10/09:10),22 mins
+12372,Howrah Weekly SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,thu,SKG(15:09/15:09) -> HWH(16:50/--),40 mins
+12377,Padatik Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(23:23/23:23) -> SKG(00:32/00:32),27 mins
+12378,Padatik Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(04:27/04:27) -> HWH(06:40/06:40),53 mins
+12379,Amritsar Jallianwala Bagh Express,SUPERFAST,hwh_skg_line,HWH,SKG,fri,HWH(13:13/13:13) -> SKG(14:20/14:20),26 mins
+12380,Sealdah Jallianwala Bagh Express,SUPERFAST,hwh_skg_line,SKG,HWH,sun,SKG(14:40/14:40) -> HWH(16:31/16:31),44 mins
+12381,Poorva Express,SUPERFAST,hwh_skg_line,HWH,SKG,"wed,thu,sun",HWH(--/08:15) -> SKG(09:01/09:01),18 mins
+12382,Poorva Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,fri",SKG(15:19/15:19) -> HWH(17:00/--),40 mins
+12937,Garba SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,sat,SKG(11:38/11:38) -> HWH(12:55/--),30 mins
+12938,Garba SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,mon,HWH(--/23:00) -> SKG(23:56/23:56),22 mins
+12987,Ajmer SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(22:57/22:57) -> SKG(23:59/23:59),24 mins
+12988,Sealdah SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(13:56/13:56) -> HWH(15:46/15:46),44 mins
+13005,Amritsar Mail,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:20) -> SKG(20:06/20:06),18 mins
+13006,Howrah Mail,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(05:50/05:50) -> HWH(07:25/--),38 mins
+13009,Doon Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:25) -> SKG(22:06/22:06),55 mins
+13010,Doon Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(04:35/04:35) -> HWH(07:00/--),58 mins
+13011,Malda Town Intercity Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:25) -> SKG(17:02/17:02),38 mins
+13012,Howrah Intercity Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(09:14/09:14) -> HWH(11:25/--),52 mins
+13015,Jamalpur Kavi Guru Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/10:55) -> SKG(12:33/12:33),39 mins
+13016,Howrah Kavi Guru Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(14:24/14:24) -> HWH(16:30/--),50 mins
+13017,Ganadevta Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:05) -> SKG(07:27/07:27),32 mins
+13018,Ganadevta Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(19:40/19:40) -> HWH(21:50/--),52 mins
+13019,Bagh Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:40) -> SKG(23:13/23:13),37 mins
+13020,Bagh Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(08:25/08:25) -> HWH(11:15/--),68 mins
+13021,Mithila Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:50) -> SKG(17:56/17:56),50 mins
+13022,Mithila Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(01:35/01:35) -> HWH(04:00/--),58 mins
+13023,Howrah - Gaya Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:00) -> SKG(21:21/21:21),32 mins
+13024,Gaya - Howrah Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(00:52/00:52) -> HWH(03:15/--),57 mins
+13025,Bhopal Weekly Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,mon,HWH(--/12:35) -> SKG(13:21/13:21),18 mins
+13026,Howrah Weekly Express,Mail/Express,hwh_skg_line,SKG,HWH,wed,SKG(13:41/13:41) -> HWH(15:10/--),35 mins
+13027,Azimganj Kaviguru Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/22:40) -> SKG(00:04/00:04),33 mins
+13028,Howrah Kaviguru Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(11:41/11:41) -> HWH(13:55/--),53 mins
+13029,Howrah - Mokama Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/23:20) -> SKG(01:18/01:18),47 mins
+13030,Mokama - Howrah Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(00:49/00:49) -> HWH(03:25/--),62 mins
+13031,Howrah - Jaynagar Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/11:25) -> SKG(13:19/13:19),45 mins
+13032,Jaynagar - Howrah Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(18:52/18:52) -> HWH(21:15/--),57 mins
+13035,Upasana Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"tue,fri",HWH(--/13:00) -> SKG(13:58/13:58),23 mins
+13036,Upasana Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"wed,sat",SKG(01:46/01:46) -> HWH(03:15/--),35 mins
+13037,Kumbh Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,wed,thu,sat,sun",HWH(--/13:00) -> SKG(13:58/13:58),23 mins
+13038,Kumbh Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,thu,fri,sun",SKG(01:46/01:46) -> HWH(03:15/--),35 mins
+13041,Himgiri Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"tue,fri,sat",HWH(--/23:55) -> SKG(00:54/00:54),23 mins
+13042,Himgiri Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,thu,sun",SKG(10:02/10:02) -> HWH(11:30/--),35 mins
+13043,Howrah - Raxaul Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"wed,fri",HWH(--/23:00) -> SKG(00:51/00:51),44 mins
+13044,Raxaul - Howrah Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"thu,sat",SKG(10:02/10:02) -> HWH(12:15/--),53 mins
+13045,Mayurakshi Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:25) -> SKG(18:10/18:10),42 mins
+13046,Mayurakshi Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(09:29/09:29) -> HWH(11:35/--),50 mins
+13047,Vibhuti Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:55) -> SKG(20:45/20:45),20 mins
+13048,Vibhuti Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(06:01/06:01) -> HWH(07:35/--),37 mins
+13051,Netaji Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:55) -> SKG(22:46/22:46),20 mins
+13052,Netaji Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(06:29/06:29) -> HWH(08:05/--),38 mins
+13053,Kulik Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/08:55) -> SKG(10:33/10:33),39 mins
+13054,Kulik Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(12:58/12:58) -> HWH(15:20/--),56 mins
+13065,Howrah - Anand Vihar Terminal Amrit Bharat Express,Amrit Bharat Express,hwh_skg_line,HWH,SKG,thu,HWH(--/23:10) -> SKG(00:54/00:54),41 mins
+13066,Anand Vihar Terminal - Howrah Amrit Bharat Express,Amrit Bharat Express,hwh_skg_line,SKG,HWH,sat,SKG(08:07/08:07) -> HWH(10:50/--),65 mins
+13071,Howrah - Jamalpur Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:30) -> SKG(22:16/22:16),18 mins
+13072,Jamalpur - Howrah Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(03:56/03:56) -> HWH(05:35/--),39 mins
+13427,Sahibganj Intercity Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/13:45) -> SKG(15:28/15:28),41 mins
+13428,Howrah Intercity Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(09:47/09:47) -> HWH(12:10/--),57 mins
+15235,Darbhanga Weekly Express,MAIL EXPRESS,hwh_skg_line,HWH,SKG,sat,HWH(--/11:15) -> SKG(12:02/12:02),18 mins
+15236,Howrah Weekly Express,MAIL EXPRESS,hwh_skg_line,SKG,HWH,fri,SKG(01:16/01:16) -> HWH(03:05/--),43 mins
+15271,Muzaffarpur Jan Sadharan Express,Mail/Express,hwh_skg_line,HWH,SKG,wed,HWH(--/11:15) -> SKG(12:02/12:02),18 mins
+15272,Howrah Jan Sadharan Express,Mail/Express,hwh_skg_line,SKG,HWH,tue,SKG(01:16/01:16) -> HWH(03:05/--),43 mins
+20975,Chambal Express,Superfast Express,hwh_skg_line,HWH,SKG,tue,HWH(--/17:45) -> SKG(18:46/18:46),24 mins
+20976,Chambal Express,SUPERFAST,hwh_skg_line,SKG,HWH,thu,SKG(05:26/05:26) -> HWH(06:55/--),35 mins
+22301,Howrah - New Jalpaiguri Vande Bharat Express,Vande Bharat Express,hwh_skg_line,HWH,SKG,"mon,tue,thu,fri,sat,sun",HWH(--/05:55) -> SKG(06:46/06:46),20 mins
+22302,New Jalpaiguri - Howrah Vande Bharat Express,Vande Bharat Express,hwh_skg_line,SKG,HWH,"mon,tue,thu,fri,sat,sun",SKG(21:08/21:08) -> HWH(22:30/--),32 mins
+22303,Howrah - Gaya Vande Bharat Express,Vande Bharat Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,fri,sat,sun",HWH(--/06:45) -> SKG(07:29/07:29),17 mins
+22304,Gaya - Howrah Vande Bharat Express,Vande Bharat Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,fri,sat,sun",SKG(20:04/20:04) -> HWH(21:10/--),26 mins
+22307,Bikaner SF Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,thu,fri",HWH(--/23:30) -> SKG(00:16/00:16),18 mins
+22308,Howrah SF Express,SUPERFAST,hwh_skg_line,SKG,HWH,"wed,sat,sun",SKG(03:16/03:16) -> HWH(04:55/--),39 mins
+22309,Howrah - Jamalpur Vande Bharat Express,Vande Bharat Express,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,sat,sun",HWH(--/07:45) -> SKG(08:35/08:35),20 mins
+22310,Jamalpur - Howrah Vande Bharat Express,Vande Bharat Express,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,sat,sun",SKG(20:47/20:47) -> HWH(22:05/--),31 mins
+22317,Sealdah - Jammu Tawi Humsafar Express,Humsafar Express,hwh_skg_line,HWH,SKG,mon,HWH(13:13/13:13) -> SKG(14:20/14:20),26 mins
+22318,Jammu Tawi - Sealdah Humsafar Express,Humsafar Express,hwh_skg_line,SKG,HWH,wed,SKG(15:51/15:51) -> HWH(17:26/17:26),38 mins
+22321,Hool Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:55) -> SKG(08:11/08:11),30 mins
+22322,Hool Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(16:06/16:06) -> HWH(18:00/--),45 mins
+22347,Howrah - Patna Vande Bharat Express,Vande Bharat Express,hwh_skg_line,HWH,SKG,"mon,tue,thu,fri,sat,sun",HWH(--/15:50) -> SKG(16:36/16:36),18 mins
+22348,Patna - Howrah Vande Bharat Express,Vande Bharat Express,hwh_skg_line,SKG,HWH,"mon,tue,thu,fri,sat,sun",SKG(13:26/13:26) -> HWH(14:35/--),27 mins
+22387,Black Diamond Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:15) -> SKG(07:39/07:39),33 mins
+22388,Black Diamond Express,SUPERFAST,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(19:25/19:25) -> HWH(21:30/--),50 mins
+22587,Sealdah - Banaras Amrit Bharat Express,Amrit Bharat Express,hwh_skg_line,HWH,SKG,"mon,wed,sat",HWH(19:32/19:32) -> SKG(20:28/20:28),22 mins
+22588,Banaras - Sealdah Amrit Bharat Express,Amrit Bharat Express,hwh_skg_line,SKG,HWH,"tue,fri,sun",SKG(08:14/08:14) -> HWH(09:51/09:51),38 mins
+22911,Shipra Express,SUPERFAST,hwh_skg_line,SKG,HWH,"tue,thu,sat",SKG(05:26/05:26) -> HWH(06:55/--),35 mins
+22912,Shipra Express,SUPERFAST,hwh_skg_line,HWH,SKG,"mon,thu,sat",HWH(--/17:45) -> SKG(18:46/18:46),24 mins
+36811,Howrah - Barddhaman Local via-Chord Line,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/04:00) -> SKG(05:42/05:43),40 mins
+36812,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(03:05/03:05) -> HWH(05:05/--),48 mins
+36813,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/04:55) -> SKG(06:34/06:35),39 mins
+36814,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(04:06/04:07) -> HWH(06:10/--),49 mins
+36815,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:10) -> SKG(07:58/07:59),43 mins
+36816,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(05:06/05:07) -> HWH(07:10/--),49 mins
+36817,Howrah-Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/07:15) -> SKG(09:07/09:08),44 mins
+36818,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(05:41/05:42) -> HWH(07:45/--),49 mins
+36819,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/08:25) -> SKG(10:10/10:11),42 mins
+36820,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(06:11/06:12) -> HWH(08:15/--),49 mins
+36821,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/09:30) -> SKG(11:14/11:15),41 mins
+36822,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(06:51/06:52) -> HWH(08:55/--),49 mins
+36823,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/10:17) -> SKG(11:58/11:59),40 mins
+36824,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(07:16/07:17) -> HWH(09:10/--),45 mins
+36825,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/11:22) -> SKG(13:12/13:13),44 mins
+36826,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(07:41/07:42) -> HWH(09:35/--),45 mins
+36827,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/12:00) -> SKG(13:56/13:57),46 mins
+36828,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(08:21/08:22) -> HWH(10:15/--),45 mins
+36829,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/13:20) -> SKG(15:09/15:10),43 mins
+36830,Barddhaman - Howrah Chord Line Super Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(08:46/08:46) -> HWH(10:05/--),31 mins
+36831,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/14:45) -> SKG(16:26/16:27),40 mins
+36832,Howrah BWN-HWH CHORD LOCAL,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(09:25/09:26) -> HWH(11:25/--),47 mins
+36833,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:35) -> SKG(17:21/17:22),42 mins
+36834,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(10:16/10:17) -> HWH(12:05/--),43 mins
+36835,Howrah - Barddhaman Chord Line Super Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:27) -> SKG(18:43/18:43),30 mins
+36836,Barddhaman - Howrah Chord Line Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(11:23/11:24) -> HWH(13:15/--),44 mins
+36837,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:33) -> SKG(19:22/19:23),43 mins
+36838,Barddhaman - Howrah Chord Line Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(11:58/11:59) -> HWH(14:18/--),55 mins
+36839,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:10) -> SKG(19:55/19:56),42 mins
+36840,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(13:16/13:17) -> HWH(15:15/--),47 mins
+36841,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:30) -> SKG(20:22/20:23),44 mins
+36842,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(14:32/14:33) -> HWH(16:25/--),44 mins
+36843,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:57) -> SKG(20:55/20:56),47 mins
+36844,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(15:37/15:38) -> HWH(17:30/--),44 mins
+36845,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:40) -> SKG(21:31/21:32),44 mins
+36846,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(17:07/17:08) -> HWH(19:05/--),46 mins
+36847,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:20) -> SKG(22:15/22:16),46 mins
+36848,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(18:01/18:02) -> HWH(19:55/--),45 mins
+36849,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:10) -> SKG(23:03/23:04),45 mins
+36850,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(18:56/18:57) -> HWH(20:47/--),44 mins
+36851,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/21:40) -> SKG(23:29/23:30),43 mins
+36852,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(19:31/19:32) -> HWH(21:40/--),51 mins
+36853,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/22:10) -> SKG(23:56/23:57),42 mins
+36854,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(20:11/20:12) -> HWH(22:10/--),47 mins
+36855,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/23:15) -> SKG(01:06/01:07),44 mins
+36856,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(20:41/20:42) -> HWH(22:35/--),45 mins
+36858,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(21:11/21:12) -> HWH(23:10/--),47 mins
+36860,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(22:21/22:22) -> HWH(00:10/--),43 mins
+37811,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/04:15) -> SKG(06:13/06:14),47 mins
+37812,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(03:16/03:17) -> HWH(05:27/--),52 mins
+37813,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/05:00) -> SKG(06:57/06:58),46 mins
+37814,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(04:16/04:17) -> HWH(06:35/--),55 mins
+37815,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/05:15) -> SKG(07:14/07:15),47 mins
+37816,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(05:16/05:17) -> HWH(07:28/--),52 mins
+37817,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/06:20) -> SKG(08:22/08:23),48 mins
+37818,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(05:51/05:52) -> HWH(08:12/--),56 mins
+37819,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/07:00) -> SKG(08:58/08:59),47 mins
+37820,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(06:20/06:21) -> HWH(08:31/--),52 mins
+37821,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/08:05) -> SKG(10:03/10:04),47 mins
+37822,Barddhaman - Howrah Main Line Super Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(06:45/06:45) -> HWH(08:30/--),42 mins
+37823,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/09:00) -> SKG(11:04/11:05),49 mins
+37824,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(07:26/07:27) -> HWH(09:40/--),53 mins
+37825,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/10:05) -> SKG(12:11/12:12),50 mins
+37826,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(07:51/07:52) -> HWH(09:52/--),48 mins
+37827,Howrah - Barddhaman Local via-Main Line,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/11:30) -> SKG(13:35/13:36),50 mins
+37828,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(08:32/08:33) -> HWH(10:40/--),50 mins
+37829,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/12:30) -> SKG(14:32/14:33),48 mins
+37830,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(09:01/09:02) -> HWH(11:10/--),51 mins
+37831,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/14:20) -> SKG(16:18/16:19),47 mins
+37832,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(10:09/10:10) -> HWH(12:40/--),60 mins
+37833,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,sat,HWH(--/14:52) -> SKG(16:51/16:52),47 mins
+37834,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(11:33/11:34) -> HWH(13:50/--),54 mins
+37835,Howrah - Barddhaman Galloping local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sun",HWH(--/14:55) -> SKG(16:51/16:52),46 mins
+37836,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(12:36/12:37) -> HWH(14:46/--),51 mins
+37837,Howrah - Barddhaman Galloping local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/15:40) -> SKG(17:35/17:36),46 mins
+37838,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(13:51/13:52) -> HWH(16:12/--),56 mins
+37839,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:45) -> SKG(18:44/18:45),47 mins
+37840,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(15:21/15:22) -> HWH(17:37/--),54 mins
+37841,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:35) -> SKG(19:33/19:34),47 mins
+37842,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(16:41/16:42) -> HWH(19:00/--),55 mins
+37843,Howrah - Barddhaman Main Line Super Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/17:55) -> SKG(19:40/19:40),42 mins
+37844,Barddhaman - Howrah Galloping Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sun",SKG(17:36/17:37) -> HWH(19:49/--),52 mins
+37845,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat",HWH(--/18:05) -> SKG(20:06/20:07),48 mins
+37846,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,sat,SKG(17:36/17:37) -> HWH(19:49/--),52 mins
+37847,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/18:35) -> SKG(20:33/20:34),47 mins
+37848,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(18:11/18:12) -> HWH(20:22/--),52 mins
+37849,Howrah - Barddhaman Galloping Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:00) -> SKG(20:46/20:46),42 mins
+37850,Barddhaman - Howrah Local via-Main Line,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(18:51/18:52) -> HWH(20:59/--),50 mins
+37851,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/19:10) -> SKG(21:07/21:08),46 mins
+37852,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(20:01/20:02) -> HWH(22:18/--),54 mins
+37853,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:20) -> SKG(22:34/22:35),53 mins
+37854,Barddhaman - Howrah Local,SUBURBAN,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(20:51/20:52) -> HWH(23:17/--),58 mins
+37855,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/20:52) -> SKG(22:53/22:54),48 mins
+37857,Howrah - Barddhaman Local,SUBURBAN,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/22:10) -> SKG(00:09/00:10),47 mins
+53047,Viswabharati Fast Passenger,PASSENGER,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/16:40) -> SKG(18:27/18:27),42 mins
+53048,Viswabharati Fast Passenger,PASSENGER,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(07:58/07:58) -> HWH(10:10/--),52 mins
+63501,Howrah - Barddhaman Fast MEMU,MEMU,hwh_skg_line,HWH,SKG,"mon,tue,wed,thu,fri,sat,sun",HWH(--/01:30) -> SKG(03:08/03:08),39 mins
+63502,Barddhaman - Howrah MEMU,MEMU,hwh_skg_line,SKG,HWH,"mon,tue,wed,thu,fri,sat,sun",SKG(22:09/22:10) -> HWH(00:15/--),50 mins
+763,Renigunta - Nischintapur Express,PARCEL EXPRESS,sdah_knj_line,SDAH,KNJ,thu,SDAH(14:58/14:58) -> RHA(01:56/01:56) -> KNJ(02:57/02:57),24 mins
+13103,Bhagirathi Express,MAIL EXPRESS,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/18:20) -> RHA(19:48/19:50) -> KNJ(20:12/20:14),8 mins
+13104,Bhagirathi Express,MAIL EXPRESS,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(08:02/08:04) -> RHA(08:34/08:40) -> SDAH(10:25/--),42 mins
+13115,Sealdah - Jalpaiguri Road Humsafar Express,Humsafar Express,sdah_knj_line,SDAH,KNJ,fri,SDAH(--/23:40) -> RHA(00:50/00:52) -> KNJ(01:26/01:28),13 mins
+13116,Jalpaiguri Road - Sealdah Humsafar Express,Humsafar Express,sdah_knj_line,KNJ,SDAH,sat,KNJ(05:12/05:14) -> RHA(06:08/06:10) -> SDAH(08:10/--),48 mins
+31801,Sealdah - Krishnanagar City Matribhoomi Ladies Special Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat",SDAH(--/17:05) -> RHA(18:56/18:57) -> KNJ(19:29/--),12 mins
+31802,Krishnanagar City - Sealdah Matribhoomi Ladies Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat",KNJ(--/08:40) -> RHA(09:11/09:12) -> SDAH(11:00/--),43 mins
+31811,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/03:20) -> RHA(05:12/05:14) -> KNJ(05:48/--),13 mins
+31812,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/04:20) -> RHA(04:57/04:58) -> SDAH(06:46/--),43 mins
+31813,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat",SDAH(--/05:37) -> RHA(07:25/07:26) -> KNJ(08:00/--),13 mins
+31814,Krishnanagar City - Sealdah Galloping Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/05:00) -> RHA(05:33/05:34) -> SDAH(07:12/--),39 mins
+31815,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/06:10) -> RHA(07:58/07:59) -> KNJ(08:34/--),14 mins
+31816,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/06:07) -> RHA(06:39/06:40) -> SDAH(08:27/--),42 mins
+31817,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/06:55) -> RHA(08:44/08:45) -> KNJ(09:22/--),14 mins
+31818,Krishnanagar City - Sealdah Galloping Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/07:04) -> RHA(07:38/07:39) -> SDAH(09:22/--),41 mins
+31819,Sealdah - Krishnanagar City Galloping Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/07:52) -> RHA(09:35/09:36) -> KNJ(10:10/--),13 mins
+31820,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/09:00) -> RHA(09:30/09:31) -> SDAH(11:22/--),44 mins
+31821,Sealdah - Krishnanagar City Galloping Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/09:34) -> RHA(11:17/11:18) -> KNJ(11:50/--),12 mins
+31822,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/09:50) -> RHA(10:23/10:24) -> SDAH(12:10/--),42 mins
+31824,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/12:12) -> RHA(12:43/12:44) -> SDAH(14:30/--),42 mins
+31825,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/10:52) -> RHA(12:41/12:42) -> KNJ(13:18/--),14 mins
+31827,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/12:05) -> RHA(13:53/13:54) -> KNJ(14:26/--),12 mins
+31828,Krishnanagar City - Sealdah Galloping Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/14:15) -> RHA(14:45/14:46) -> SDAH(16:15/--),35 mins
+31829,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/13:15) -> RHA(15:03/15:04) -> KNJ(15:35/--),12 mins
+31830,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/15:20) -> RHA(15:52/15:53) -> SDAH(17:37/--),41 mins
+31831,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/15:25) -> RHA(17:15/17:16) -> KNJ(17:50/--),13 mins
+31832,Krishnanagar City - Sealdah Galloping Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/16:20) -> RHA(16:51/16:52) -> SDAH(18:40/--),43 mins
+31833,Sealdah - Krishnanagar City Galloping Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/16:08) -> RHA(18:00/18:02) -> KNJ(18:35/--),13 mins
+31834,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/18:32) -> RHA(19:11/19:12) -> SDAH(20:58/--),42 mins
+31835,Sealdah - Krishnanagar City Galloping Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/17:34) -> RHA(19:16/19:18) -> KNJ(19:49/--),12 mins
+31836,Krishnanagar City - Sealdah Galloping Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/19:24) -> RHA(19:57/19:58) -> SDAH(21:43/--),42 mins
+31837,Sealdah - Krishnanagar City Galloping Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/18:43) -> RHA(20:26/20:27) -> KNJ(20:59/--),12 mins
+31838,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat",KNJ(--/20:00) -> RHA(20:35/20:36) -> SDAH(22:25/--),43 mins
+31840,Krishnanagar City - Sealdah Galloping Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/20:25) -> RHA(21:02/21:08) -> SDAH(22:55/--),42 mins
+31841,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/19:35) -> RHA(21:23/21:24) -> KNJ(21:57/--),13 mins
+31843,Sealdah - Krishnanagar City Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/20:55) -> RHA(22:46/22:47) -> KNJ(23:17/--),12 mins
+31844,Krishnanagar City - Sealdah Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(--/22:22) -> RHA(22:53/22:54) -> SDAH(00:40/--),42 mins
+31845,Sealdah - Krishnanagar City AC Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat",SDAH(--/09:48) -> RHA(11:37/11:38) -> KNJ(12:07/--),11 mins
+31846,Krishnanagar City - Sealdah AC Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat",KNJ(--/13:30) -> RHA(13:55/13:56) -> SDAH(15:40/--),41 mins
+31847,Sealdah - Krishnanagar City AC Local,SUBURBAN,sdah_knj_line,SDAH,KNJ,sun,SDAH(--/11:55) -> RHA(13:43/13:44) -> KNJ(14:11/--),10 mins
+31848,Krishnanagar City - Sealdah AC Local,SUBURBAN,sdah_knj_line,KNJ,SDAH,sun,KNJ(--/16:05) -> RHA(16:36/16:37) -> SDAH(18:20/--),41 mins
+53171,Sealdah - Lalgola Passenger,PASSENGER,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/03:45) -> RHA(05:34/05:36) -> KNJ(06:20/06:23),17 mins
+53172,Lalgola - Sealdah Passenger,PASSENGER,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(01:25/01:29) -> RHA(02:10/02:18) -> SDAH(04:30/--),52 mins
+53175,Sealdah - Lalgola Passenger,PASSENGER,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/12:40) -> RHA(14:24/14:26) -> KNJ(15:13/15:15),18 mins
+53178,Lalgola - Sealdah Passenger,PASSENGER,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(12:25/12:28) -> RHA(13:15/13:17) -> SDAH(15:12/--),46 mins
+53180,Lalgola - Sealdah Passenger,PASSENGER,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(17:29/17:31) -> RHA(18:12/18:16) -> SDAH(20:10/--),45 mins
+53181,Sealdah - Lalgola Passenger,PASSENGER,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/23:30) -> RHA(01:12/01:14) -> KNJ(02:02/02:07),19 mins
+63103,Sealdah - Lalgola MEMU,MEMU,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/19:15) -> RHA(21:03/21:04) -> KNJ(21:30/21:32),10 mins
+63104,Lalgola - Sealdah MEMU,MEMU,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(13:48/13:50) -> RHA(14:23/14:24) -> SDAH(16:00/--),38 mins
+63105,Sealdah - Lalgola MEMU,MEMU,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/20:20) -> RHA(21:58/21:59) -> KNJ(22:26/22:27),10 mins
+63106,Lalgola - Sealdah MEMU,MEMU,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(21:09/21:10) -> RHA(21:45/21:46) -> SDAH(23:25/--),39 mins
+63107,Sealdah - Lalgola MEMU,MEMU,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/10:28) -> RHA(12:08/12:09) -> KNJ(12:35/12:37),10 mins
+63108,Lalgola - Sealdah MEMU,MEMU,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(07:28/07:30) -> RHA(08:12/08:14) -> SDAH(10:05/--),44 mins
+63176,Lalgola - Sealdah MEMU,MEMU,sdah_knj_line,KNJ,SDAH,"mon,tue,wed,thu,fri,sat,sun",KNJ(10:20/10:22) -> RHA(11:02/11:03) -> SDAH(12:45/--),40 mins
+63177,Sealdah - Lalgola MEMU,MEMU,sdah_knj_line,SDAH,KNJ,"mon,tue,wed,thu,fri,sat,sun",SDAH(--/16:40) -> RHA(18:19/18:21) -> KNJ(19:01/19:02),16 mins

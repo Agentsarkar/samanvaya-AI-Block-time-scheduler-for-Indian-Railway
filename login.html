@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | SAMANVAY - Unified Maintenance DSS</title>
+  <meta name="description" content="Ministry of Railways Maintenance and Emergency Decision Support System login portal.">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="./static/css/fonts.css" rel="stylesheet">
+  <script src="./static/js/tailwind.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'Arial', 'sans-serif'],
+          },
+          colors: {
+            rail: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#172554',
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', Roboto, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100 text-slate-800 antialiased">
+
+  <div class="flex min-h-screen flex-col lg:flex-row">
+    <!-- Left: institutional hero image with blue overlay -->
+    <div class="relative hidden w-full bg-slate-900 lg:block lg:w-1/2 xl:w-3/5">
+      <img src="./railway.jpg" alt="Indian Railways tracks and infrastructure" class="h-full w-full object-cover">
+      <div class="absolute inset-0 bg-rail-900/80"></div>
+      <div class="absolute inset-0 flex flex-col justify-between p-10 text-white">
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="inline-grid h-8 w-8 place-items-center bg-white text-xs font-bold text-rail-900">IR</span>
+            <p class="text-sm font-semibold uppercase tracking-wider text-rail-100">
+              Government of India
+            </p>
+          </div>
+          <p class="mt-2 text-lg font-bold">Ministry of Railways</p>
+        </div>
+        <div class="max-w-xl">
+          <h2 class="text-3xl font-bold leading-tight xl:text-4xl">
+            Safe, Reliable &amp; Efficient Railway Operations
+          </h2>
+          <p class="mt-4 text-base leading-relaxed text-rail-100">
+            SAMANVAY — Integrated maintenance planning and emergency response platform for the Indian Railways network.
+          </p>
+          <div class="mt-6 flex items-center gap-4 text-xs text-rail-100">
+            <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-green-400"></span> Live DSS Active</span>
+            <span>•</span>
+            <span>Eastern Railway / Howrah Division</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: login panel -->
+    <div class="flex w-full flex-col justify-between bg-white px-6 py-10 lg:w-1/2 lg:px-16 xl:w-2/5 xl:px-20">
+      <div class="mx-auto w-full max-w-md">
+        <!-- Header -->
+        <div class="mb-6 text-center lg:text-left">
+          <p class="text-xs font-bold uppercase tracking-widest text-rail-700">
+            Ministry of Railways
+          </p>
+          <h1 class="mt-2 text-2xl font-extrabold text-rail-950 sm:text-3xl">
+            SAMANVAY - <br> Unified Maintenance DSS
+          </h1>
+          <p class="mt-2 text-sm text-slate-500">
+            Secure access for authorized railway personnel only.
+          </p>
+        </div>
+
+        <!-- Alert messages container -->
+        <div id="alert-box" class="mb-5 hidden rounded-md p-3 text-sm font-medium"></div>
+
+        <!-- Quick Demo Switcher helper -->
+        <div class="mb-5 rounded-md border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+          <div class="flex items-center justify-between">
+            <span class="font-bold flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rail-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Quick Fill Demo Accounts:
+            </span>
+          </div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button type="button" onclick="fillCredentials('7842901', 'railway@123', 'maintenance-planner')" class="rounded border border-blue-300 bg-white px-2 py-1 font-semibold text-rail-800 hover:bg-blue-100 transition-colors">
+              Divisional Engineer (7842901)
+            </button>
+            <button type="button" onclick="fillCredentials('7842902', 'railway@123', 'control-room')" class="rounded border border-blue-300 bg-white px-2 py-1 font-semibold text-rail-800 hover:bg-blue-100 transition-colors">
+              Control Room (7842902)
+            </button>
+          </div>
+        </div>
+
+        <!-- Login form -->
+        <form id="login-form" class="space-y-4">
+          <!-- Employee ID -->
+          <div>
+            <label for="employeeId" class="mb-1 block text-sm font-semibold text-slate-700">
+              Employee ID / HRMS ID
+            </label>
+            <input id="employeeId" name="employeeId" type="text" autocomplete="username" value="7842901" placeholder="e.g. 7842901" required class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-gray-400 shadow-sm transition-colors focus:border-rail-700 focus:outline-none focus:ring-1 focus:ring-rail-700">
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="mb-1 block text-sm font-semibold text-slate-700">
+              Password
+            </label>
+            <input id="password" name="password" type="password" autocomplete="current-password" value="railway@123" placeholder="Enter your password" required class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-gray-400 shadow-sm transition-colors focus:border-rail-700 focus:outline-none focus:ring-1 focus:ring-rail-700">
+          </div>
+
+          <!-- Role selector -->
+          <div>
+            <span class="mb-2 block text-sm font-semibold text-slate-700">Select Module</span>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="flex cursor-pointer items-center rounded-md border border-gray-300 bg-white p-3 transition-colors hover:bg-gray-50 has-[:checked]:border-rail-700 has-[:checked]:bg-rail-50">
+                <input id="role-control" type="radio" name="role" value="control-room" class="h-4 w-4 border-gray-300 text-rail-700 focus:ring-rail-700">
+                <span class="ml-3 text-xs font-medium text-slate-700">Control Room</span>
+                <span class="ml-auto text-[10px] font-bold text-rail-700">Live DSS</span>
+              </label>
+              <label class="flex cursor-pointer items-center rounded-md border border-gray-300 bg-white p-3 transition-colors hover:bg-gray-50 has-[:checked]:border-rail-700 has-[:checked]:bg-rail-50">
+                <input id="role-planner" type="radio" name="role" value="maintenance-planner" checked class="h-4 w-4 border-gray-300 text-rail-700 focus:ring-rail-700">
+                <span class="ml-3 text-xs font-medium text-slate-700">Maintenance Planner</span>
+                <span class="ml-auto text-[10px] font-bold text-rail-700">Strategic</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- CAPTCHA -->
+          <div>
+            <label for="captcha" class="mb-2 block text-sm font-semibold text-slate-700">
+              Security Verification
+            </label>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div class="shrink-0 overflow-hidden rounded-md border border-gray-300 bg-gray-50">
+                <svg width="160" height="46" viewBox="0 0 160 46" xmlns="http://www.w3.org/2000/svg" aria-label="CAPTCHA code RAIL 7842">
+                  <rect width="160" height="46" fill="#f3f4f6"></rect>
+                  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="20" font-weight="bold" fill="#1e3a8a" transform="rotate(-4 80 23)">RAIL 7842</text>
+                  <line x1="8" y1="8" x2="152" y2="38" stroke="#9ca3af" stroke-width="1"></line>
+                  <line x1="152" y1="8" x2="8" y2="38" stroke="#9ca3af" stroke-width="1"></line>
+                  <circle cx="35" cy="18" r="2" fill="#9ca3af"></circle>
+                  <circle cx="120" cy="30" r="2" fill="#9ca3af"></circle>
+                  <circle cx="95" cy="14" r="1.5" fill="#9ca3af"></circle>
+                </svg>
+              </div>
+              <input id="captcha" name="captcha" type="text" maxlength="12" value="RAIL 7842" placeholder="Enter CAPTCHA" required class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-gray-400 shadow-sm transition-colors focus:border-rail-700 focus:outline-none focus:ring-1 focus:ring-rail-700">
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button id="submit-btn" type="submit" class="w-full rounded-md bg-rail-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-rail-800 focus:outline-none focus:ring-2 focus:ring-rail-700 focus:ring-offset-2 flex items-center justify-center gap-2">
+            <span id="btn-text">Secure Login</span>
+            <svg id="btn-spinner" class="hidden h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+
+          <!-- Helper links -->
+          <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+            <span class="cursor-pointer font-medium text-rail-700 hover:underline" onclick="showAlert('info', 'For password recovery, please contact your Divisional Railway Office (Sr. DPO/HRMS Cell).')">
+              Forgot password?
+            </span>
+            <span class="cursor-pointer font-medium text-rail-700 hover:underline" onclick="showAlert('info', 'HRMS integration portal is reachable on IR Intranet (RailNet).')">
+              HRMS unlock
+            </span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="mx-auto w-full max-w-md pt-8 text-center lg:text-left">
+        <div class="h-px w-full bg-gray-200"></div>
+        <p class="mt-4 text-xs leading-relaxed text-slate-500">
+          Center for Railway Information Systems (CRIS)<br>
+          Unauthorized access is strictly prohibited under Indian Railways Act.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showAlert(type, text) {
+      const box = document.getElementById('alert-box');
+      box.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'border-red-300', 'bg-green-50', 'text-green-800', 'border-green-300', 'bg-blue-50', 'text-blue-800', 'border-blue-300');
+      box.classList.add('border');
+
+      if (type === 'error') {
+        box.classList.add('bg-red-50', 'text-red-700', 'border-red-300');
+      } else if (type === 'success') {
+        box.classList.add('bg-green-50', 'text-green-800', 'border-green-300');
+      } else {
+        box.classList.add('bg-blue-50', 'text-blue-800', 'border-blue-300');
+      }
+      box.innerHTML = text;
+    }
+
+    function fillCredentials(empId, pwd, role) {
+      document.getElementById('employeeId').value = empId;
+      document.getElementById('password').value = pwd;
+      document.getElementById('captcha').value = 'RAIL 7842';
+      if (role === 'control-room') {
+        document.getElementById('role-control').checked = true;
+      } else {
+        document.getElementById('role-planner').checked = true;
+      }
+    }
+
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const employeeId = document.getElementById('employeeId').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const captcha = document.getElementById('captcha').value.trim();
+      const roleElem = document.querySelector('input[name="role"]:checked');
+      const role = roleElem ? roleElem.value : 'maintenance-planner';
+
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+
+      submitBtn.disabled = true;
+      btnSpinner.classList.remove('hidden');
+      btnText.textContent = 'Authenticating...';
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ employeeId, password, role, captcha })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          showAlert('success', `<b>Login Successful!</b> Welcome ${data.user.name}. Redirecting to dashboard...`);
+          // Store user profile in localStorage for instant sync
+          localStorage.setItem('samanvay_user', JSON.stringify(data.user));
+          setTimeout(() => {
+            window.location.href = data.redirect || '/index.html';
+          }, 600);
+        } else {
+          showAlert('error', data.message || 'Login failed. Please check credentials.');
+          submitBtn.disabled = false;
+          btnSpinner.classList.add('hidden');
+          btnText.textContent = 'Secure Login';
+        }
+      } catch (err) {
+        // Fallback offline simulation if accessed directly via file://
+        console.warn('Backend fetch failed, attempting client-side authentication:', err);
+        if (employeeId === '7842901' && password === 'railway@123') {
+          const fallbackUser = {
+            employeeId: '7842901',
+            name: 'Rajesh Sharma',
+            roleId: 'maintenance-planner',
+            roleTitle: 'Divisional Engineer (Eastern Railway)',
+            division: 'Howrah',
+            section: 'HWH–BWN Main Line'
+          };
+          localStorage.setItem('samanvay_user', JSON.stringify(fallbackUser));
+          showAlert('success', 'Authenticated locally! Redirecting...');
+          setTimeout(() => { window.location.href = './index.html'; }, 600);
+        } else {
+          showAlert('error', 'Authentication server offline. Use credentials: 7842901 / railway@123');
+          submitBtn.disabled = false;
+          btnSpinner.classList.add('hidden');
+          btnText.textContent = 'Secure Login';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

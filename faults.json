@@ -1,0 +1,506 @@
+{
+  "corridor": "Eastern Railway Operational Network (Howrah, Sealdah & Asansol Divisions)",
+  "total_faults": 11,
+  "critical_safety_alerts": 4,
+  "categories_summary": {
+    "Track": 5,
+    "Traction": 3,
+    "Signal": 3
+  },
+  "faults": [
+    {
+      "id": "ASN-TRK-01",
+      "task_code": "ASN-TRK-01",
+      "corridor_id": "bwn_asn_trunk",
+      "category": "Track",
+      "department": "Track",
+      "fault_type": "Thermit Weld Micro-Fissure",
+      "severity": "CRITICAL",
+      "priority": "P1",
+      "line": "UP Trunk Line",
+      "chainage": "KM 158/2",
+      "location_name": "Between Raniganj & Andal Jn (Asansol Trunk)",
+      "nearest_station": "RNG",
+      "lat": 23.602851,
+      "long": 87.11698,
+      "start_coords": [
+        23.579012,
+        87.181194
+      ],
+      "end_coords": [
+        23.602851,
+        87.11698
+      ],
+      "track_segment": [
+        [
+          23.579012,
+          87.181194
+        ],
+        [
+          23.602851,
+          87.11698
+        ]
+      ],
+      "speed_restriction_kmph": 20,
+      "detected_time": "2026-09-10 05:30 IST",
+      "required_block_duration_min": 105,
+      "status": "POSSESSION_REQUESTED",
+      "affected_trains": [
+        "12301 HOWRAH RAJDHANI",
+        "12313 SEALDAH RAJDHANI"
+      ],
+      "action_required": "Thermit weld cut and re-weld under emergency block with weld trimmer.",
+      "km_mark": 158.2,
+      "asset_tag": "Weld Micro-Fissure"
+    },
+    {
+      "id": "ASN-OHE-02",
+      "task_code": "ASN-OHE-02",
+      "corridor_id": "bwn_asn_trunk",
+      "category": "Traction",
+      "department": "Traction",
+      "fault_type": "Catenary Insulator Flashover & Tension Loss",
+      "severity": "HIGH",
+      "priority": "P1",
+      "line": "UP & DN Trunk Lines",
+      "chainage": "KM 166/8",
+      "location_name": "Andal Junction Marshalling Yard (Asansol Trunk)",
+      "nearest_station": "UDL",
+      "lat": 23.579012,
+      "long": 87.181194,
+      "start_coords": [
+        23.495046,
+        87.297902
+      ],
+      "end_coords": [
+        23.579012,
+        87.181194
+      ],
+      "track_segment": [
+        [
+          23.495046,
+          87.297902
+        ],
+        [
+          23.579012,
+          87.181194
+        ]
+      ],
+      "speed_restriction_kmph": 30,
+      "detected_time": "2026-09-09 16:15 IST",
+      "required_block_duration_min": 90,
+      "status": "CLUSTER_RECOMMENDED",
+      "affected_trains": [
+        "BOXN / 8A COAL",
+        "12019 SHATABDI"
+      ],
+      "action_required": "OHE power isolation and 9-ton insulator replacement by tower wagon.",
+      "km_mark": 166.8,
+      "asset_tag": "Andal Yard Insulator"
+    },
+    {
+      "id": "SDAH-TRK-05",
+      "task_code": "SDAH-TRK-05",
+      "corridor_id": "sdah_knj_line",
+      "category": "Track",
+      "department": "Track",
+      "fault_type": "Track Settlement & Dynamic Gauge Widening",
+      "severity": "CRITICAL",
+      "priority": "P1",
+      "line": "UP Sealdah Main Line",
+      "chainage": "KM 22/8",
+      "location_name": "Between Titagarh & Barrackpore",
+      "nearest_station": "BP",
+      "lat": 22.7610653,
+      "long": 88.371428,
+      "start_coords": [
+        22.74168,
+        88.374057
+      ],
+      "end_coords": [
+        22.7610653,
+        88.371428
+      ],
+      "track_segment": [
+        [
+          22.74168,
+          88.374057
+        ],
+        [
+          22.7610653,
+          88.371428
+        ]
+      ],
+      "speed_restriction_kmph": 20,
+      "detected_time": "2026-09-10 07:15 IST",
+      "required_block_duration_min": 110,
+      "status": "POSSESSION_REQUESTED",
+      "affected_trains": [
+        "31825 SDAH-KNJ LOCAL",
+        "31221 BARRACKPORE LOCAL"
+      ],
+      "action_required": "Ballast tamping with UNIMAT tamper, gauge correction and tie renewal under traffic block.",
+      "km_mark": 22.8,
+      "asset_tag": "Titagarh\u2013BP Track"
+    },
+    {
+      "id": "SDAH-SIG-08",
+      "task_code": "SDAH-SIG-08",
+      "corridor_id": "sdah_knj_line",
+      "category": "Signal",
+      "department": "Signal",
+      "fault_type": "Audio Frequency Track Circuit (AFTC) Glitch",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "line": "UP & DN Sealdah Main",
+      "chainage": "KM 25/4",
+      "location_name": "Between Barrackpore & Palta",
+      "nearest_station": "PTF",
+      "lat": 22.782449,
+      "long": 88.369524,
+      "start_coords": [
+        22.7610653,
+        88.371428
+      ],
+      "end_coords": [
+        22.782449,
+        88.369524
+      ],
+      "track_segment": [
+        [
+          22.7610653,
+          88.371428
+        ],
+        [
+          22.782449,
+          88.369524
+        ]
+      ],
+      "speed_restriction_kmph": 25,
+      "detected_time": "2026-09-09 19:40 IST",
+      "required_block_duration_min": 45,
+      "status": "FEASIBLE",
+      "affected_trains": [
+        "Local 31818",
+        "31320 KALYANI LOCAL"
+      ],
+      "action_required": "Recalibrate AFTC tuning unit receiver and replace surge protection card.",
+      "km_mark": 25.4,
+      "asset_tag": "AFTC Circuit PTF"
+    },
+    {
+      "id": "SDAH-OHE-12",
+      "task_code": "SDAH-OHE-12",
+      "corridor_id": "sdah_knj_line",
+      "category": "Traction",
+      "department": "Traction",
+      "fault_type": "Contact Wire Splice Defect & Sparking",
+      "severity": "HIGH",
+      "priority": "P2",
+      "line": "DN Sealdah Main Line",
+      "chainage": "KM 48/2",
+      "location_name": "Between Kalyani & Madanpur",
+      "nearest_station": "MPJ",
+      "lat": 23.005928,
+      "long": 88.489717,
+      "start_coords": [
+        22.969219,
+        88.467499
+      ],
+      "end_coords": [
+        23.005928,
+        88.489717
+      ],
+      "track_segment": [
+        [
+          22.969219,
+          88.467499
+        ],
+        [
+          23.005928,
+          88.489717
+        ]
+      ],
+      "speed_restriction_kmph": 40,
+      "detected_time": "2026-09-09 16:50 IST",
+      "required_block_duration_min": 75,
+      "status": "SCHEDULED",
+      "affected_trains": [
+        "31818 RANAGHAT LOCAL",
+        "31522 SHANTIPUR LOCAL"
+      ],
+      "action_required": "OHE tower wagon possession to replace worn contact wire splice and re-tension span.",
+      "km_mark": 48.2,
+      "asset_tag": "Kalyani Wire Splice"
+    },
+    {
+      "id": "CHD-TRK-14",
+      "task_code": "CHD-TRK-14",
+      "corridor_id": "hwh_bwn_chord",
+      "category": "Track",
+      "department": "Track",
+      "fault_type": "Turnout Point Diamond Crossing Rail Flaw",
+      "severity": "CRITICAL",
+      "priority": "P1",
+      "line": "UP Chord Fast Line",
+      "chainage": "KM 34/2",
+      "location_name": "Kamarkundu Junction Crossing (Chord Line)",
+      "nearest_station": "KQU",
+      "lat": 22.821631,
+      "long": 88.205127,
+      "start_coords": [
+        22.78738,
+        88.224626
+      ],
+      "end_coords": [
+        22.821631,
+        88.205127
+      ],
+      "track_segment": [
+        [
+          22.78738,
+          88.224626
+        ],
+        [
+          22.821631,
+          88.205127
+        ]
+      ],
+      "speed_restriction_kmph": 20,
+      "detected_time": "2026-09-10 04:20 IST",
+      "required_block_duration_min": 100,
+      "status": "POSSESSION_REQUESTED",
+      "affected_trains": [
+        "12313 RAJDHANI",
+        "BOXN / 4A FREIGHT"
+      ],
+      "action_required": "Replace CMS crossing nose and re-align switch rail assembly.",
+      "km_mark": 34.2,
+      "asset_tag": "Kamarkundu Diamond Crossing"
+    },
+    {
+      "id": "CHD-SIG-15",
+      "task_code": "CHD-SIG-15",
+      "corridor_id": "hwh_bwn_chord",
+      "category": "Signal",
+      "department": "Signal",
+      "fault_type": "Solid State Interlock (SSI) Track Circuit Loss",
+      "severity": "HIGH",
+      "priority": "P2",
+      "line": "Chord Reversible Line",
+      "chainage": "KM 36/8",
+      "location_name": "Between Kamarkundu & Madhusudanpur",
+      "nearest_station": "MDSE",
+      "lat": 22.845108,
+      "long": 88.193499,
+      "start_coords": [
+        22.821631,
+        88.205127
+      ],
+      "end_coords": [
+        22.845108,
+        88.193499
+      ],
+      "track_segment": [
+        [
+          22.821631,
+          88.205127
+        ],
+        [
+          22.845108,
+          88.193499
+        ]
+      ],
+      "speed_restriction_kmph": 30,
+      "detected_time": "2026-09-09 21:10 IST",
+      "required_block_duration_min": 50,
+      "status": "FEASIBLE",
+      "affected_trains": [
+        "12314 RAJDHANI DOWN",
+        "Freight DN-9"
+      ],
+      "action_required": "Replace fail-safe timer card and re-test SSI track occupancy relays.",
+      "km_mark": 36.8,
+      "asset_tag": "SSI Relays MDSE"
+    },
+    {
+      "id": "TMS-042",
+      "task_code": "TMS-042",
+      "corridor_id": "hwh_bwn_main",
+      "category": "Track",
+      "department": "Track",
+      "fault_type": "Rail Fracture",
+      "severity": "CRITICAL",
+      "priority": "P1",
+      "line": "UP Main Line",
+      "chainage": "KM 41/4",
+      "location_name": "Between Bandel Jn and Adi Saptagram",
+      "nearest_station": "ADST",
+      "lat": 22.95447,
+      "long": 88.378872,
+      "start_coords": [
+        22.9236565,
+        88.3793623
+      ],
+      "end_coords": [
+        22.95447,
+        88.378872
+      ],
+      "track_segment": [
+        [
+          22.9236565,
+          88.3793623
+        ],
+        [
+          22.95447,
+          88.378872
+        ]
+      ],
+      "speed_restriction_kmph": 15,
+      "detected_time": "2026-09-10 06:40 IST",
+      "required_block_duration_min": 120,
+      "status": "POSSESSION_REQUESTED",
+      "affected_trains": [
+        "13009 DOON EXP",
+        "37216 LOCAL"
+      ],
+      "action_required": "Emergency fish-plating done. Complete rail renewal with thermit welding required during night mega-block.",
+      "km_mark": 41.4,
+      "asset_tag": "Thermit Rail Fracture"
+    },
+    {
+      "id": "SNT-208",
+      "task_code": "SNT-208",
+      "corridor_id": "hwh_bwn_main",
+      "category": "Signal",
+      "department": "Signal",
+      "fault_type": "Point Machine Motor Sensor Anomaly",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "line": "Yard / Reversible",
+      "chainage": "KM 39/8",
+      "location_name": "Bandel Yard West Crossover",
+      "nearest_station": "BDC",
+      "lat": 22.9236565,
+      "long": 88.3793623,
+      "start_coords": [
+        22.904835,
+        88.375632
+      ],
+      "end_coords": [
+        22.9236565,
+        88.3793623
+      ],
+      "track_segment": [
+        [
+          22.904835,
+          88.375632
+        ],
+        [
+          22.9236565,
+          88.3793623
+        ]
+      ],
+      "speed_restriction_kmph": 20,
+      "detected_time": "2026-09-09 18:20 IST",
+      "required_block_duration_min": 45,
+      "status": "FEASIBLE",
+      "affected_trains": [
+        "SHUNT / YD-2",
+        "Local 37216"
+      ],
+      "action_required": "Replace point machine detection rod assembly and recalibrate interlock relay feedback.",
+      "km_mark": 39.8,
+      "asset_tag": "Point 112 (Bandel Yard)"
+    },
+    {
+      "id": "TDMS-11",
+      "task_code": "TDMS-11",
+      "corridor_id": "hwh_bwn_main",
+      "category": "Traction",
+      "department": "Traction",
+      "fault_type": "OHE Catenary Dropper Defect & Misalignment",
+      "severity": "HIGH",
+      "priority": "P1",
+      "line": "UP & DN Main Lines",
+      "chainage": "KM 82/4",
+      "location_name": "Between Memari & Rasulpur (Upper Main Line)",
+      "nearest_station": "MYM",
+      "lat": 23.172935,
+      "long": 88.095637,
+      "start_coords": [
+        23.172935,
+        88.095637
+      ],
+      "end_coords": [
+        23.187229,
+        88.039994
+      ],
+      "track_segment": [
+        [
+          23.172935,
+          88.095637
+        ],
+        [
+          23.187229,
+          88.039994
+        ]
+      ],
+      "speed_restriction_kmph": 30,
+      "detected_time": "2026-09-09 14:15 IST",
+      "required_block_duration_min": 90,
+      "status": "CLUSTER_RECOMMENDED",
+      "affected_trains": [
+        "12019 SHATABDI",
+        "BOXN / 4A"
+      ],
+      "action_required": "OHE power isolation required. Tower car to adjust dropper tension and replace cracked insulator.",
+      "km_mark": 82.4,
+      "asset_tag": "Memari Catenary Dropper"
+    },
+    {
+      "id": "ENG-031",
+      "task_code": "ENG-031",
+      "corridor_id": "hwh_bwn_main",
+      "category": "Track",
+      "department": "Track",
+      "fault_type": "Bridge Wing-Wall Scour & Embankment Settlement",
+      "severity": "ROUTINE",
+      "priority": "P3",
+      "line": "All Main Lines",
+      "chainage": "KM 20/4",
+      "location_name": "Between Serampore & Baidyabati (Lower Main Line)",
+      "nearest_station": "SRP",
+      "lat": 22.753968,
+      "long": 88.338031,
+      "start_coords": [
+        22.753968,
+        88.338031
+      ],
+      "end_coords": [
+        22.79549199,
+        88.33203765
+      ],
+      "track_segment": [
+        [
+          22.753968,
+          88.338031
+        ],
+        [
+          22.79549199,
+          88.33203765
+        ]
+      ],
+      "speed_restriction_kmph": 50,
+      "detected_time": "2026-09-07 09:10 IST",
+      "required_block_duration_min": 40,
+      "status": "PENDING_WINDOW",
+      "affected_trains": [
+        "Nil (Non-interfering)"
+      ],
+      "action_required": "Grouting of masonry wing walls and placement of geo-textile sandbags.",
+      "km_mark": 20.4,
+      "asset_tag": "Bridge 18B (Serampore)"
+    }
+  ]
+}
